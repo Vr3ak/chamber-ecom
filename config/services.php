@@ -34,5 +34,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'khqr' => [
+    'account_id'    => env('BAKONG_ACCOUNT_ID', 'chamber@aclb'),
+    'merchant_name' => env('KHQR_MERCHANT_NAME', 'Chamber'),
+    'merchant_city' => env('KHQR_MERCHANT_CITY', 'Phnom Penh'),
+    'currency'      => env('KHQR_CURRENCY', '840'), // 840=USD, 116=KHR
+],
+    
 
 ];

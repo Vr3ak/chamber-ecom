@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
+ * A single variant as the variant picker needs it.
+ *
  * @mixin ProductVariant
  */
 class ProductVariantResource extends JsonResource
@@ -15,16 +17,15 @@ class ProductVariantResource extends JsonResource
     {
         return [
             'id'              => $this->id,
-            'sku'             => $this->sku,
             'color'           => $this->whenLoaded('color', fn () => [
-                'id'   => $this->color->id,
-                'name' => $this->color->name,
-                'hex'  => $this->color->hex,
+                'id'       => $this->color->id,
+                'name'     => $this->color->name,
+                'hex_code' => $this->color->hex_code,
             ]),
             'size'            => $this->whenLoaded('size', fn () => [
-                'id'    => $this->size->id,
-                'label' => $this->size->label,
-                'cm'    => $this->size->cm !== null ? (float) $this->size->cm : null,
+                'id'             => $this->size->id,
+                'label'          => $this->size->label,
+                'foot_length_cm' => $this->size->foot_length_cm !== null ? (float) $this->size->foot_length_cm : null,
             ]),
             'price'           => $this->price !== null ? (float) $this->price : null,
             'effective_price' => $this->effective_price,

@@ -16,7 +16,7 @@ class ReviewResource extends JsonResource
         return [
             'id'          => $this->id,
             'rating'      => (int) $this->rating,
-            'comment'     => $this->comment,
+            'body'        => $this->body,
             'is_verified' => (bool) $this->is_verified,
             'author'      => $this->whenLoaded('user', fn () => $this->user->name),
             'created_at'  => $this->created_at?->toDateString(),

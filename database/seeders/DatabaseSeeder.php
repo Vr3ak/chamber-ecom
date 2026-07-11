@@ -13,11 +13,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Test User',
+            'name'  => 'Test User',
             'email' => 'test@example.com',
         ]);
 
         // Chamber catalogue (brands, colours, sizes, products, variants, reviews).
         $this->call(ChamberSeeder::class);
+
+        // Default admin account (admin@chamber.test / password).
+        $this->call(AdminSeeder::class);
+
+        // Feature 3 sample order + payment history (Mission 5 scenario).
+        $this->call(OrderSeeder::class);
     }
 }

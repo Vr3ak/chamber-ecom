@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Size;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\OrderTrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,8 @@ Route::post('admin/login', [AdminAuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('admin/me', [AdminAuthController::class, 'me']);
     Route::post('admin/logout', [AdminAuthController::class, 'logout']);
+    Route::post('admin/orders/{order}/advance', [OrderTrackingController::class, 'advance']);
+    Route::get('admin/notifications/failed', [OrderTrackingController::class, 'failedNotifications']);
 });
 
 // ---- Feature 1: public reads (catalogue + detailed product page) ----
@@ -49,12 +52,13 @@ Route::get('colors',     fn () => Color::orderBy('name')->get(['id', 'name', 'he
 Route::get('sizes',      fn () => Size::orderBy('sort_order')->get(['id', 'label', 'foot_length_cm']));
 Route::get('categories', fn () => Category::with('children')->whereNull('parent_id')->get());
 
-// ---- Feature 3: orders + payments (KHQR / credit card) ----
+// ---- Feature 3: orders + payments (KHQR) ----
 Route::get('orders', [OrderController::class, 'index']);
 Route::post('orders', [OrderController::class, 'store']);
 Route::get('orders/{order}', [OrderController::class, 'show']);
 Route::post('orders/{order}/pay', [PaymentController::class, 'pay']);
 Route::post('payments/{payment}/confirm', [PaymentController::class, 'confirm']);
+Route::get('orders/{order}/tracking', [OrderTrackingController::class, 'timeline']);
 
 // ---- Admin writes (catalogue management) — protected ----
 Route::middleware('auth:sanctum')->group(function () {

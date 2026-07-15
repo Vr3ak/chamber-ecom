@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Notification;
+use App\Models\OrderTracking;
 
 /**
  * notifications — a record of every email/SMS sent to a customer
@@ -21,7 +23,7 @@ return new class extends Migration
             $table->string('recipient', 180);
             $table->enum('status', ['queued', 'sent', 'failed'])->default('queued');
             $table->timestamp('sent_at')->nullable();
-
+            $table->enum('channel', ['email']);
             $table->index('order_id', 'idx_notif_order');
         });
     }

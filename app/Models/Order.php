@@ -76,4 +76,13 @@ class Order extends Model
     {
         return 'CH-'.date('Y').'-'.str_pad((string) $id, 4, '0', STR_PAD_LEFT);
     }
+    public function tracking(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderTracking::class)->orderBy('created_at');
+    }
+
+    public function notifications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

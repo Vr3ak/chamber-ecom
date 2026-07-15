@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProductController;
+// use App\Http\Controllers\ProductController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -11,5 +11,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+// Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+// Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');

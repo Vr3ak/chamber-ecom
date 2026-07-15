@@ -66,7 +66,33 @@ class OrderSeeder extends Seeder
             ['transaction_ref' => 'CARD-VISA-9931'],
             ['method' => 'credit_card', 'status' => 'succeeded', 'amount' => 240.00, 'currency' => 'USD', 'paid_at' => now()]
         );
+        // Feature 4 — fulfilment timeline
+        $stages = [
+            ['paid',      'Payment confirmed via KHQR',    '2026-06-20 09:25:00'],
+            ['packed',    'Packed and ready at warehouse', '2026-06-20 11:00:00'],
+            ['shipped',   'Handed to J&T Express courier', '2026-06-21 08:00:00'],
+            ['delivered', 'Delivered to customer at door', '2026-06-22 14:30:00'],
+        ];
+        foreach ($stages as [$status, $note, $at]) {
+            OrderTracking::firstOrCreate(
+                ['order_id' => $order->id, 'status' => $status],
+                ['note' => $note, 'created_at' => $at]
+            );
+        }
 
-        $order->update(['status' => 'paid']);
+        $notifs = [
+            ['order_confirmed', '2026-06-20 09:25:30'],
+            ['order_shipped',   '2026-06-21 08:01:00'],
+            ['order_delivered', '2026-06-22 14:31:00'],
+        ];
+        foreach ($notifs as [$type, $sentAt]) {
+            Notification::firstOrCreate(
+                ['order_id' => $order->id, 'type' => $type],
+                ['user_id' => $order->user_id, 'channel' => 'email', 'recipient' => $order->user->email, 'status' => 'sent', 'sent_at' => $sentAt]
+            );
+        }
+
+        $order->update(['status' => 'delivered', 'tracking_number' => 'KH123456789'
+        ]);
     }
 }

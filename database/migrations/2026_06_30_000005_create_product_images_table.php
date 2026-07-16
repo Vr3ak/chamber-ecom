@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('url');
             $table->string('alt')->nullable();
             $table->unsignedSmallInteger('sort_order')->default(0); // gallery ordering
+            $table->boolean('is_primary')->default(false);          // main gallery image
             $table->timestamps();
 
             $table->index('product_id', 'idx_images_product');

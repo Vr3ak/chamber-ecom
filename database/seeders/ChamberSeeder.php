@@ -30,24 +30,25 @@ class ChamberSeeder extends Seeder
         );
 
         // ---- users (review authors) ----
-        $dara    = User::firstOrCreate(['email' => 'dara@gmail.com'],    ['name' => 'Dara Sok',     'password' => Hash::make('password')]);
-        $lina    = User::firstOrCreate(['email' => 'lina@gmail.com'],    ['name' => 'Lina Chan',    'password' => Hash::make('password')]);
-        $sopheak = User::firstOrCreate(['email' => 'sopheak@gmail.com'], ['name' => 'Sopheak Meas', 'password' => Hash::make('password')]);
+        $verified = ['password' => Hash::make('password'), 'email_verified_at' => now()];
+        $dara = User::firstOrCreate(['email' => 'dara@gmail.com'], ['name' => 'Dara Sok', ...$verified]);
+        $lina = User::firstOrCreate(['email' => 'lina@gmail.com'], ['name' => 'Lina Chan', ...$verified]);
+        $sopheak = User::firstOrCreate(['email' => 'sopheak@gmail.com'], ['name' => 'Sopheak Meas', ...$verified]);
 
         // ---- brands ----
-        $nike   = Brand::firstOrCreate(['name' => 'Nike'],   ['slug' => 'nike',   'logo_image' => '/img/nike.png']);
+        $nike = Brand::firstOrCreate(['name' => 'Nike'], ['slug' => 'nike',   'logo_image' => '/img/nike.png']);
         $adidas = Brand::firstOrCreate(['name' => 'Adidas'], ['slug' => 'adidas', 'logo_image' => '/img/adidas.png']);
-        $puma   = Brand::firstOrCreate(['name' => 'Puma'],   ['slug' => 'puma',   'logo_image' => '/img/puma.png']);
+        $puma = Brand::firstOrCreate(['name' => 'Puma'], ['slug' => 'puma',   'logo_image' => '/img/puma.png']);
 
         // ---- categories (Footwear > Sneakers > Running, + Boots) ----
         $footwear = Category::firstOrCreate(['slug' => 'footwear'], ['name' => 'Footwear']);
         $sneakers = Category::firstOrCreate(['slug' => 'sneakers'], ['name' => 'Sneakers', 'parent_id' => $footwear->id]);
-        $running  = Category::firstOrCreate(['slug' => 'running'],  ['name' => 'Running',  'parent_id' => $sneakers->id]);
+        $running = Category::firstOrCreate(['slug' => 'running'], ['name' => 'Running',  'parent_id' => $sneakers->id]);
         Category::firstOrCreate(['slug' => 'boots'], ['name' => 'Boots', 'parent_id' => $footwear->id]);
 
         // ---- colors ----
-        $red   = Color::firstOrCreate(['name' => 'Red'],   ['hex_code' => '#E24B4A']);
-        $blue  = Color::firstOrCreate(['name' => 'Blue'],  ['hex_code' => '#378ADD']);
+        $red = Color::firstOrCreate(['name' => 'Red'], ['hex_code' => '#E24B4A']);
+        $blue = Color::firstOrCreate(['name' => 'Blue'], ['hex_code' => '#378ADD']);
         $black = Color::firstOrCreate(['name' => 'Black'], ['hex_code' => '#222222']);
         Color::firstOrCreate(['name' => 'White'], ['hex_code' => '#F2F2F2']);
 
@@ -68,7 +69,7 @@ class ChamberSeeder extends Seeder
             [$red,  $s43, null, 8],
             [$blue, $s42, null, 5],
         ]);
-        $airmax->images()->firstOrCreate(['url' => '/img/am90-red.jpg'],  ['color_id' => $red->id,  'alt' => 'Air Max 90 red',  'sort_order' => 0, 'is_primary' => true]);
+        $airmax->images()->firstOrCreate(['url' => '/img/am90-red.jpg'], ['color_id' => $red->id,  'alt' => 'Air Max 90 red',  'sort_order' => 0, 'is_primary' => true]);
         $airmax->images()->firstOrCreate(['url' => '/img/am90-blue.jpg'], ['color_id' => $blue->id, 'alt' => 'Air Max 90 blue', 'sort_order' => 1, 'is_primary' => false]);
 
         // ---- product 2: UltraBoost (Adidas, 150) ----
@@ -96,7 +97,7 @@ class ChamberSeeder extends Seeder
 
         // ---- trending (admin curates featured shoes) ----
         Trending::firstOrCreate(['product_id' => $airmax->id], ['admin_id' => $admin->id, 'sort_order' => 1, 'is_active' => true]);
-        Trending::firstOrCreate(['product_id' => $ultra->id],  ['admin_id' => $admin->id, 'sort_order' => 2, 'is_active' => true]);
+        Trending::firstOrCreate(['product_id' => $ultra->id], ['admin_id' => $admin->id, 'sort_order' => 2, 'is_active' => true]);
 
         // ---- reviews (Air Max 90 -> avg 4.5 over 2) ----
         Review::firstOrCreate(['product_id' => $airmax->id, 'user_id' => $dara->id],

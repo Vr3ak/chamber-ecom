@@ -1,46 +1,38 @@
 <?php
 
-namespace App\Services;
+namespace App\Models;
 
-use App\Models\Order;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Advances an order to a new fulfilment stage: logs a tracking row, updates
- * orders.status, and sends the email notification that stage triggers.
+ * One row in an order's fulfilment timeline (Feature 4): paid, packed,
+ * shipped, delivered... Append-only; the order_tracking table has only a
+ * created_at (no updated_at).
+ *
+ * @property int $id
+ * @property int $order_id
+ * @property string $status
+ * @property string|null $note
  */
-class OrderTrackingService
+class OrderTracking extends Model
 {
-    private const NOTIFY_MAP = [
-        'paid'      => ['order_confirmed'],
-        'packed'    => [],
-        'shipped'   => ['order_shipped'],
-        'delivered' => ['order_delivered'],
-        'cancelled' => ['order_update'],
-    ];
+    use HasFactory;
 
-    public function __construct(private readonly NotificationService $notifications)
+    protected $table = 'order_tracking';
+
+    public $timestamps = false; // table has created_at only, set explicitly
+
+    protected $fillable = ['order_id', 'status', 'note', 'created_at'];
+
+    protected function casts(): array
     {
+        return ['created_at' => 'datetime'];
     }
 
-    public function advance(Order $order, string $status, ?string $note = null, ?string $tracking = null): Order
+    public function order(): BelongsTo
     {
-        if ($tracking) {
-            $order->tracking_number = $tracking;
-        }
-
-        $order->tracking()->create([
-            'status'     => $status,
-            'note'       => $note,
-            'created_at' => now(),
-        ]);
-
-        $order->status = $status;
-        $order->save();
-
-        foreach (self::NOTIFY_MAP[$status] ?? [] as $type) {
-            $this->notifications->notify($order, $type);
-        }
-
-        return $order->fresh()->load(['items', 'tracking', 'notifications']);
+        return $this->belongsTo(Order::class);
     }
 }

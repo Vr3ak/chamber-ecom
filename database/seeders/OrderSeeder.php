@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Notification;
 use App\Models\Order;
+use App\Models\OrderTracking;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -16,7 +18,7 @@ class OrderSeeder extends Seeder
 {
     public function run(): void
     {
-        $user    = User::where('email', 'dara@gmail.com')->first();
+        $user = User::where('email', 'dara@gmail.com')->first();
         $product = Product::where('slug', 'air-max-90')->first();
 
         if (! $user || ! $product) {
@@ -35,23 +37,23 @@ class OrderSeeder extends Seeder
         $order = Order::firstOrCreate(
             ['order_number' => 'CH-2026-0001'],
             [
-                'user_id'          => $user->id,
-                'status'           => 'pending',
-                'shipping_name'    => 'Dara Sok',
-                'shipping_phone'   => '012345678',
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'shipping_name' => 'Dara Sok',
+                'shipping_phone' => '012345678',
                 'shipping_address' => 'St 271, Toul Kork, Phnom Penh, Cambodia',
-                'placed_at'        => now(),
+                'placed_at' => now(),
             ]
         );
 
         $order->items()->firstOrCreate(
             ['product_variant_id' => $variant->id],
             [
-                'product_name'  => 'Air Max 90',
+                'product_name' => 'Air Max 90',
                 'variant_label' => 'Red / 42',
-                'unit_price'    => 120.00,
-                'quantity'      => 2,
-                'line_total'    => 240.00,
+                'unit_price' => 120.00,
+                'quantity' => 2,
+                'line_total' => 240.00,
             ]
         );
 
@@ -92,7 +94,7 @@ class OrderSeeder extends Seeder
             );
         }
 
-        $order->update(['status' => 'delivered', 'tracking_number' => 'KH123456789'
+        $order->update(['status' => 'delivered', 'tracking_number' => 'KH123456789',
         ]);
     }
 }

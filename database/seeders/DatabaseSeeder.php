@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name'  => 'Test User',
+            'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
 
         // Default admin account (admin@chamber.test / password).
         $this->call(AdminSeeder::class);
+
+        // Storefront catalogue matching the Figma (Men/Women/Kids shoes).
+        $this->call(ShoeSeeder::class);
 
         // Feature 3 sample order + payment history (Mission 5 scenario).
         $this->call(OrderSeeder::class);

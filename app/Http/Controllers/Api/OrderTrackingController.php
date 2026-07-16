@@ -20,13 +20,11 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  */
 class OrderTrackingController extends Controller
 {
-    public function __construct(private readonly OrderTrackingService $service)
-    {
-    }
+    public function __construct(private readonly OrderTrackingService $service) {}
 
     public function advance(AdvanceOrderRequest $request, Order $order): JsonResponse
     {
-        $data  = $request->validated();
+        $data = $request->validated();
         $order = $this->service->advance(
             $order,
             $data['status'],
@@ -35,14 +33,14 @@ class OrderTrackingController extends Controller
         );
 
         return response()->json([
-            'order'    => new OrderResource($order),
-            'tracking' => OrderTrackingResource::collection($this->timelineRows($order)),
+            'order' => new OrderResource($order),
+            'tracking' => OrderTrackingResource::collection($order->trackingTimeline()),
         ]);
     }
 
     public function timeline(Order $order): AnonymousResourceCollection
     {
-        return OrderTrackingResource::collection($this->timelineRows($order));
+        return OrderTrackingResource::collection($order->trackingTimeline());
     }
 
     public function failedNotifications(): AnonymousResourceCollection
@@ -50,24 +48,5 @@ class OrderTrackingController extends Controller
         return NotificationResource::collection(
             Notification::where('status', 'failed')->orderByDesc('id')->get()
         );
-    }
-
-    private const STAGE_NOTIFICATION = [
-        'paid'      => 'order_confirmed',
-        'shipped'   => 'order_shipped',
-        'delivered' => 'order_delivered',
-    ];
-
-    private function timelineRows(Order $order)
-    {
-        $order->loadMissing(['tracking', 'notifications']);
-        $byType = $order->notifications->keyBy('type');
-
-        return $order->tracking->map(function ($row) use ($byType) {
-            $type = self::STAGE_NOTIFICATION[$row->status] ?? null;
-            $row->matched_notification = $type ? $byType->get($type) : null;
-
-            return $row;
-        });
     }
 }

@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 /**
  * A customer order (checkout). Feature 3 creates it and attaches payments;
  * Feature 4 walks its status forward and logs tracking + notifications.
  *
- * @property int    $id
- * @property int    $user_id
+ * @property int $id
+ * @property int $user_id
  * @property string $order_number
  * @property string $status
- * @property float  $subtotal
- * @property float  $total
+ * @property float $subtotal
+ * @property float $total
  */
 class Order extends Model
 {
@@ -31,8 +32,8 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'subtotal'  => 'decimal:2',
-            'total'     => 'decimal:2',
+            'subtotal' => 'decimal:2',
+            'total' => 'decimal:2',
             'placed_at' => 'datetime',
         ];
     }
@@ -61,7 +62,7 @@ class Order extends Model
     {
         $subtotal = (float) $this->items()->sum('line_total');
         $this->subtotal = $subtotal;
-        $this->total    = $subtotal; // no shipping/tax in this project
+        $this->total = $subtotal; // no shipping/tax in this project
         $this->save();
     }
 
@@ -76,13 +77,39 @@ class Order extends Model
     {
         return 'CH-'.date('Y').'-'.str_pad((string) $id, 4, '0', STR_PAD_LEFT);
     }
-    public function tracking(): \Illuminate\Database\Eloquent\Relations\HasMany
+
+    public function tracking(): HasMany
     {
         return $this->hasMany(OrderTracking::class)->orderBy('created_at');
     }
 
-    public function notifications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
+    }
+
+    /** Which notification type each fulfilment stage triggers. */
+    private const STAGE_NOTIFICATION = [
+        'paid' => 'order_confirmed',
+        'shipped' => 'order_shipped',
+        'delivered' => 'order_delivered',
+    ];
+
+    /**
+     * Fulfilment timeline: each tracking row with its stage's notification
+     * attached as ->matched_notification. Used by the tracking API and the
+     * public /track page.
+     */
+    public function trackingTimeline(): Collection
+    {
+        $this->loadMissing(['tracking', 'notifications']);
+        $byType = $this->notifications->keyBy('type');
+
+        return $this->tracking->map(function (OrderTracking $row) use ($byType) {
+            $type = self::STAGE_NOTIFICATION[$row->status] ?? null;
+            $row->matched_notification = $type ? $byType->get($type) : null;
+
+            return $row;
+        });
     }
 }

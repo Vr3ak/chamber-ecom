@@ -96,5 +96,40 @@ class OrderSeeder extends Seeder
 
         $order->update(['status' => 'delivered', 'tracking_number' => 'KH123456789',
         ]);
+
+        $this->seedUnpaidOrder($user, $variant);
+    }
+
+    /**
+     * CH-2026-0002 — awaiting payment, no successful payment against it. Gives
+     * the KHQR payment screen (/orders/{order}/pay) something to open on; the
+     * order above is already delivered, so it only ever redirects to tracking.
+     */
+    private function seedUnpaidOrder(User $user, $variant): void
+    {
+        $order = Order::firstOrCreate(
+            ['order_number' => 'CH-2026-0002'],
+            [
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'shipping_name' => 'Dara Sok',
+                'shipping_phone' => '012345678',
+                'shipping_address' => 'St 271, Toul Kork, Phnom Penh, Cambodia',
+                'placed_at' => now(),
+            ]
+        );
+
+        $order->items()->firstOrCreate(
+            ['product_variant_id' => $variant->id],
+            [
+                'product_name' => 'Air Max 90',
+                'variant_label' => 'Red / 42',
+                'unit_price' => 120.00,
+                'quantity' => 1,
+                'line_total' => 120.00,
+            ]
+        );
+
+        $order->recalcTotals();
     }
 }

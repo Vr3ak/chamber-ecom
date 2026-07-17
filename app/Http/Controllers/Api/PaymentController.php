@@ -8,6 +8,7 @@ use App\Http\Resources\PaymentResource;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\KhqrService;
+use App\Services\OrderTrackingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -18,8 +19,10 @@ use Illuminate\Support\Str;
  */
 class PaymentController extends Controller
 {
-    public function __construct(private readonly KhqrService $khqr)
-    {
+    public function __construct(
+        private readonly KhqrService $khqr,
+        private readonly OrderTrackingService $tracking,
+    ) {
     }
 
     public function pay(Order $order): JsonResponse
@@ -58,7 +61,10 @@ class PaymentController extends Controller
             $payment->update(['status' => 'failed']);
         } else {
             $payment->update(['status' => 'succeeded', 'paid_at' => now()]);
-            $payment->order->update(['status' => 'paid']);
+            // Via the service, not a bare status write: moving to 'paid' has to
+            // log the tracking row and fire order_confirmed, or the timeline
+            // never shows the payment.
+            $this->tracking->advance($payment->order, 'paid', 'Payment received.');
         }
 
         return response()->json([

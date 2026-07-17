@@ -2,6 +2,7 @@
 
 // use App\Http\Controllers\ProductController;
 
+use App\Http\Controllers\CheckoutPaymentController;
 use App\Http\Controllers\ShopController;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderTrackingResource;
@@ -54,6 +55,13 @@ Route::get('{gender}', [ShopController::class, 'category'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+});
+
+// KHQR payment screen (Feature 3). Owner-scoped: the order comes from the
+// route and is checked against the session user, never from request input.
+Route::middleware('auth')->group(function () {
+    Route::get('orders/{order}/pay', [CheckoutPaymentController::class, 'show'])->name('checkout.pay');
+    Route::post('payments/{payment}/confirm', [CheckoutPaymentController::class, 'confirm'])->name('checkout.confirm');
 });
 
 require __DIR__.'/settings.php';

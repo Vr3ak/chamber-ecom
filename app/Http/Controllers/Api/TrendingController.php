@@ -22,8 +22,8 @@ class TrendingController extends Controller
             ->with([
                 'product' => fn ($q) => $q->active()
                     ->with(['brand', 'images'])
-                    ->withCount('reviews')
-                    ->withAvg('reviews', 'rating'),
+                    ->withCount(['reviews' => fn ($r) => $r->visible()])
+                    ->withAvg(['reviews' => fn ($r) => $r->visible()], 'rating'),
             ])
             ->get()
             ->pluck('product')

@@ -18,22 +18,23 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'brand_id'    => ['required', 'integer', Rule::exists('brands', 'id')],
-            'name'        => ['required', 'string', 'max:180'],
-            'slug'        => ['nullable', 'string', 'max:200', 'alpha_dash', Rule::unique('products', 'slug')],
+            'brand_id' => ['required', 'integer', Rule::exists('brands', 'id')],
+            'name' => ['required', 'string', 'max:180'],
+            'slug' => ['nullable', 'string', 'max:200', 'alpha_dash', Rule::unique('products', 'slug')],
             'description' => ['nullable', 'string'],
-            'base_price'  => ['required', 'numeric', 'min:0'],
-            'is_active'   => ['boolean'],
+            'base_price' => ['required', 'numeric', 'min:0'],
+            'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'max:5120'],
 
             // Optional: attach categories.
-            'category_ids'   => ['sometimes', 'array'],
+            'category_ids' => ['sometimes', 'array'],
             'category_ids.*' => ['integer', Rule::exists('categories', 'id')],
 
             // Optional: create variants in the same request.
-            'variants'                  => ['sometimes', 'array'],
-            'variants.*.color_id'       => ['required_with:variants', 'integer', Rule::exists('colors', 'id')],
-            'variants.*.size_id'        => ['required_with:variants', 'integer', Rule::exists('sizes', 'id')],
-            'variants.*.price'          => ['nullable', 'numeric', 'min:0'],
+            'variants' => ['sometimes', 'array'],
+            'variants.*.color_id' => ['required_with:variants', 'integer', Rule::exists('colors', 'id')],
+            'variants.*.size_id' => ['required_with:variants', 'integer', Rule::exists('sizes', 'id')],
+            'variants.*.price' => ['nullable', 'numeric', 'min:0'],
             'variants.*.stock_quantity' => ['required_with:variants', 'integer', 'min:0'],
         ];
     }

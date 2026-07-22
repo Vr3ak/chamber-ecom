@@ -128,4 +128,17 @@ class Product extends Model
 
         return $this->trending()->where('is_active', true)->exists();
     }
+
+    /**
+     * The variant to use when a caller wants to buy "the product" without
+     * picking a colour/size first (e.g. an "Add to cart" button on a
+     * wishlist card, which only knows the product, not a variant). Prefers
+     * an in-stock variant; falls back to any variant so an out-of-stock
+     * product can still surface a clear "no stock" message downstream.
+     */
+    public function defaultVariant(): ?ProductVariant
+    {
+        return $this->variants()->where('stock_quantity', '>', 0)->orderBy('id')->first()
+            ?? $this->variants()->orderBy('id')->first();
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AdminController;
 use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\NotificationController as AdminNotificationController;
@@ -60,6 +61,12 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('reviews', [AdminReviewController::class, 'index']);
     Route::post('reviews/{review}/hide', [AdminReviewController::class, 'hide']);
     Route::post('reviews/{review}/unhide', [AdminReviewController::class, 'unhide']);
+});
+
+// ---- Superadmin-only: manage other admin accounts ----
+Route::middleware(['auth:sanctum', 'admin', 'superadmin'])->prefix('admin')->group(function () {
+    Route::get('admins', [AdminController::class, 'index']);
+    Route::post('admins', [AdminController::class, 'store']);
 });
 
 // ---- Feature 1: public reads (catalogue + detailed product page) ----

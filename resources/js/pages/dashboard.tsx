@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ShieldCheck } from 'lucide-react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { dashboard } from '@/routes';
@@ -12,9 +12,15 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {auth.user?.is_admin && (
-                    <div className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-400">
+                    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-400">
                         <ShieldCheck className="h-4 w-4" />
                         Signed in as Administrator ({auth.user.email})
+                        <Link
+                            href="/admin"
+                            className="ml-auto rounded-md bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                        >
+                            Open admin panel
+                        </Link>
                     </div>
                 )}
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">

@@ -82,6 +82,8 @@ class CheckoutPaymentController extends Controller
         $payment->update(['status' => 'succeeded', 'paid_at' => now()]);
         $this->tracking->advance($payment->order, 'paid', 'Payment received.');
 
-        return to_route('track', ['order' => $payment->order->order_number]);
+        // Figma puts an Order Confirmation screen (node 48:3502) after a
+        // successful payment; it links on to tracking from there.
+        return to_route('checkout.confirmation', $payment->order);
     }
 }

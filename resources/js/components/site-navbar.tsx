@@ -56,8 +56,13 @@ export default function SiteNavbar({
             <div
                 className={`flex flex-1 items-center justify-end gap-6 ${icon}`}
             >
-                {/* ponytail: inert until search/wishlist/cart features exist */}
-                <Search className="h-[18px] w-[18px]" aria-hidden />
+                <Link
+                    href="/search"
+                    aria-label="Search"
+                    className="transition-colors hover:text-gold"
+                >
+                    <Search className="h-[18px] w-[18px]" />
+                </Link>
                 <Link
                     href={auth.user ? dashboard() : login()}
                     aria-label={auth.user ? 'My account' : 'Log in'}
@@ -65,15 +70,27 @@ export default function SiteNavbar({
                 >
                     <User className="h-[18px] w-[18px]" />
                 </Link>
-                <Heart className="h-[18px] w-[18px]" aria-hidden />
-                <span className="relative" aria-hidden>
+                {/* Cart and wishlist require a session; signed-out visitors are
+                    sent to login, which redirects back after authenticating. */}
+                <Link
+                    href={auth.user ? '/wishlist' : login().url}
+                    aria-label="Wishlist"
+                    className="transition-colors hover:text-gold"
+                >
+                    <Heart className="h-[18px] w-[18px]" />
+                </Link>
+                <Link
+                    href={auth.user ? '/cart' : login().url}
+                    aria-label="Cart"
+                    className="relative transition-colors hover:text-gold"
+                >
                     <ShoppingBag className="h-[22px] w-[22px]" />
                     {cartCount > 0 && (
                         <span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[9px] font-bold text-ink">
                             {cartCount}
                         </span>
                     )}
-                </span>
+                </Link>
             </div>
         </header>
     );

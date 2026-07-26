@@ -1,10 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
+import { useState } from 'react';
 import type { PropsWithChildren } from 'react';
+import LogoutConfirmModal from '@/components/logout-confirm-modal';
 import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
-import { logout } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
@@ -23,6 +24,7 @@ const sidebarNavItems: NavItem[] = [
 // storefront header, a bordered 240px nav rail, and card-framed content.
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
+    const [confirmingLogout, setConfirmingLogout] = useState(false);
 
     return (
         <div className="flex min-h-screen flex-col bg-mist font-display text-ink">
@@ -58,14 +60,16 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                             <div className="my-1 h-px bg-line" />
 
-                            <Link
-                                href={logout()}
-                                as="button"
+                            {/* Figma gates logout behind a confirmation
+                                dialog (node 102:4873). */}
+                            <button
+                                type="button"
+                                onClick={() => setConfirmingLogout(true)}
                                 className="flex h-11 items-center gap-2.5 rounded-[6px] px-4 text-left text-sm font-medium text-[#dc3232] transition-colors hover:bg-[#dc3232]/10"
                             >
                                 <span aria-hidden>→</span>
                                 Log Out
-                            </Link>
+                            </button>
                         </nav>
                     </aside>
 
@@ -77,6 +81,11 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     </div>
                 </div>
             </main>
+
+            <LogoutConfirmModal
+                open={confirmingLogout}
+                onClose={() => setConfirmingLogout(false)}
+            />
 
             <SiteFooter />
         </div>

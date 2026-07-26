@@ -12,13 +12,16 @@ createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            // Storefront pages render their own chrome (SiteNavbar/SiteFooter)
-            // and must not be wrapped in the admin shell.
+            // These all render their own chrome and must not be wrapped:
+            // storefront pages ship SiteNavbar/SiteFooter, admin pages ship
+            // AdminLayout (sidebar + topbar).
             case name === 'welcome':
             case name === 'track':
             case name.startsWith('shop/'):
             case name.startsWith('products/'):
             case name.startsWith('checkout/'):
+            case name.startsWith('orders/'):
+            case name.startsWith('admin/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;

@@ -27,8 +27,15 @@ class OrderResource extends JsonResource
             ],
             'tracking_number' => $this->tracking_number,
             'placed_at' => $this->placed_at?->toDateTimeString(),
-            'items' => OrderItemResource::collection($this->whenLoaded('items')),
-            'payments' => PaymentResource::collection($this->whenLoaded('payments')),
+            // ->resolve() so these are plain lists — see CartResource.
+            'items' => $this->whenLoaded(
+                'items',
+                fn () => OrderItemResource::collection($this->items)->resolve($request),
+            ),
+            'payments' => $this->whenLoaded(
+                'payments',
+                fn () => PaymentResource::collection($this->payments)->resolve($request),
+            ),
             'customer' => $this->whenLoaded('user', fn () => $this->user ? [
                 'id' => $this->user->id,
                 'name' => $this->user->name,

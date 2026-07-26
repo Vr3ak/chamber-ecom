@@ -10,6 +10,7 @@ use App\Http\Resources\ProductListResource;
 use App\Models\Brand;
 use App\Models\Color;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Size;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,32 +44,28 @@ class ProductController extends Controller
     {
         $brandIds = $this->ids($request->input('brand_id'));
         $colorIds = $this->ids($request->input('color_id'));
-        $sizeIds  = $this->ids($request->input('size_id'));
+        $sizeIds = $this->ids($request->input('size_id'));
 
         $products = Product::query()
             ->active()
-            ->with(['brand', 'images'])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
+            ->with(['brand', 'images', 'categories'])
+            ->withCount(['reviews' => fn ($q) => $q->visible(), 'variants'])
+            ->withSum('variants', 'stock_quantity')
+            ->withAvg(['reviews' => fn ($q) => $q->visible()], 'rating')
             // keyword search on the name
-            ->when($request->filled('q'), fn ($qb) =>
-                $qb->where('name', 'like', '%'.$request->string('q').'%'))
+            ->when($request->filled('q'), fn ($qb) => $qb->where('name', 'like', '%'.$request->string('q').'%'))
             // brand filter (one or many)
             ->when($brandIds, fn ($qb) => $qb->whereIn('brand_id', $brandIds))
             // price range on base_price
-            ->when($request->filled('min_price'), fn ($qb) =>
-                $qb->where('base_price', '>=', $request->float('min_price')))
-            ->when($request->filled('max_price'), fn ($qb) =>
-                $qb->where('base_price', '<=', $request->float('max_price')))
+            ->when($request->filled('min_price'), fn ($qb) => $qb->where('base_price', '>=', $request->float('min_price')))
+            ->when($request->filled('max_price'), fn ($qb) => $qb->where('base_price', '<=', $request->float('max_price')))
             // colour / size live on the variants
-            ->when($colorIds, fn ($qb) =>
-                $qb->whereHas('variants', fn ($v) => $v->whereIn('color_id', $colorIds)))
-            ->when($sizeIds, fn ($qb) =>
-                $qb->whereHas('variants', fn ($v) => $v->whereIn('size_id', $sizeIds)))
+            ->when($colorIds, fn ($qb) => $qb->whereHas('variants', fn ($v) => $v->whereIn('color_id', $colorIds)))
+            ->when($sizeIds, fn ($qb) => $qb->whereHas('variants', fn ($v) => $v->whereIn('size_id', $sizeIds)))
             // sorting
-            ->when($request->input('sort') === 'price_asc',  fn ($qb) => $qb->orderBy('base_price'))
+            ->when($request->input('sort') === 'price_asc', fn ($qb) => $qb->orderBy('base_price'))
             ->when($request->input('sort') === 'price_desc', fn ($qb) => $qb->orderByDesc('base_price'))
-            ->when($request->input('sort') === 'top_rated',  fn ($qb) => $qb->orderByDesc('reviews_avg_rating'))
+            ->when($request->input('sort') === 'top_rated', fn ($qb) => $qb->orderByDesc('reviews_avg_rating'))
             ->when(in_array($request->input('sort'), [null, 'newest'], true), fn ($qb) => $qb->latest())
             ->paginate($request->integer('per_page', 12))
             ->withQueryString();
@@ -110,17 +107,21 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        $data = collect($request->validated())->except(['image', 'variants', 'category_ids'])->all();
 
-        $product = DB::transaction(function () use ($data) {
+        $product = DB::transaction(function () use ($request, $data) {
             $product = Product::create($data);
 
-            foreach ($data['variants'] ?? [] as $variant) {
+            foreach ($request->validated('variants') ?? [] as $variant) {
                 $product->variants()->create($variant);
             }
 
-            if (! empty($data['category_ids'])) {
-                $product->categories()->sync($data['category_ids']);
+            if ($categoryIds = $request->validated('category_ids')) {
+                $product->categories()->sync($categoryIds);
+            }
+
+            if ($request->hasFile('image')) {
+                ProductImage::storeUpload($request->file('image'), $product->id, ['is_primary' => true]);
             }
 
             return $product;
@@ -143,8 +144,9 @@ class ProductController extends Controller
             ->where('brand_id', $product->brand_id)
             ->whereKeyNot($product->id)
             ->with(['brand', 'images'])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews' => fn ($q) => $q->visible(), 'variants'])
+            ->withSum('variants', 'stock_quantity')
+            ->withAvg(['reviews' => fn ($q) => $q->visible()], 'rating')
             ->limit(4)
             ->get();
 
@@ -156,10 +158,15 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product): ProductDetailResource
     {
         $data = $request->validated();
-        $product->update($data);
+        $product->update(collect($data)->except(['image', 'category_ids'])->all());
 
         if (array_key_exists('category_ids', $data)) {
             $product->categories()->sync($data['category_ids'] ?? []);
+        }
+
+        if ($request->hasFile('image')) {
+            $product->images()->where('is_primary', true)->delete();
+            ProductImage::storeUpload($request->file('image'), $product->id, ['is_primary' => true]);
         }
 
         return ProductDetailResource::make($this->loadDetail($product->fresh()));
@@ -197,16 +204,16 @@ class ProductController extends Controller
     private function loadDetail(Product $product): Product
     {
         return $product->load([
-                'brand',
-                'images',
-                'variants.color',
-                'variants.size',
-                'reviews.user',
-                'categories.parent',
-                'trending',
-            ])
-            ->loadCount('reviews')
-            ->loadAvg('reviews', 'rating')
+            'brand',
+            'images',
+            'variants.color',
+            'variants.size',
+            'reviews' => fn ($q) => $q->visible()->with('user'),
+            'categories.parent',
+            'trending',
+        ])
+            ->loadCount(['reviews' => fn ($q) => $q->visible(), 'variants'])
+            ->loadAvg(['reviews' => fn ($q) => $q->visible()], 'rating')
             ->loadSum('variants', 'stock_quantity');
     }
 }

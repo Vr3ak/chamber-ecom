@@ -2,8 +2,11 @@
 
 // use App\Http\Controllers\ProductController;
 
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutPaymentController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderTrackingResource;
 use App\Http\Resources\ProductListResource;
@@ -62,6 +65,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('orders/{order}/pay', [CheckoutPaymentController::class, 'show'])->name('checkout.pay');
     Route::post('payments/{payment}/confirm', [CheckoutPaymentController::class, 'confirm'])->name('checkout.confirm');
+});
+
+// Cart, wishlist, and address book (all JSON, session-owner-scoped —
+// never accept a user_id from the request, same rule as checkout above).
+Route::middleware('auth')->group(function () {
+    Route::get('cart', [CartController::class, 'show'])->name('cart.show');
+    Route::post('cart/items', [CartController::class, 'addItem'])->name('cart.items.store');
+    Route::patch('cart/items/{cartItem}', [CartController::class, 'updateItem'])->name('cart.items.update');
+    Route::delete('cart/items/{cartItem}', [CartController::class, 'removeItem'])->name('cart.items.destroy');
+    Route::delete('cart', [CartController::class, 'clear'])->name('cart.clear');
+
+    Route::get('wishlist', [WishlistController::class, 'show'])->name('wishlist.show');
+    Route::post('wishlist/items', [WishlistController::class, 'addItem'])->name('wishlist.items.store');
+    Route::delete('wishlist/items/{wishlistItem}', [WishlistController::class, 'removeItem'])->name('wishlist.items.destroy');
+
+    Route::get('addresses', [AddressController::class, 'index'])->name('addresses.index');
+    Route::post('addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::put('addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::post('addresses/{address}/default', [AddressController::class, 'makeDefault'])->name('addresses.default');
 });
 
 require __DIR__.'/settings.php';

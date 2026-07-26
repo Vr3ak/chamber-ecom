@@ -20,15 +20,16 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('product')?->id;
 
         return [
-            'brand_id'    => ['sometimes', 'required', 'integer', Rule::exists('brands', 'id')],
-            'name'        => ['sometimes', 'required', 'string', 'max:180'],
-            'slug'        => ['sometimes', 'nullable', 'string', 'max:200', 'alpha_dash',
-                              Rule::unique('products', 'slug')->ignore($productId)],
+            'brand_id' => ['sometimes', 'required', 'integer', Rule::exists('brands', 'id')],
+            'name' => ['sometimes', 'required', 'string', 'max:180'],
+            'slug' => ['sometimes', 'nullable', 'string', 'max:200', 'alpha_dash',
+                Rule::unique('products', 'slug')->ignore($productId)],
             'description' => ['sometimes', 'nullable', 'string'],
-            'base_price'  => ['sometimes', 'required', 'numeric', 'min:0'],
-            'is_active'   => ['sometimes', 'boolean'],
+            'base_price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'is_active' => ['sometimes', 'boolean'],
+            'image' => ['sometimes', 'nullable', 'image', 'max:5120'],
 
-            'category_ids'   => ['sometimes', 'array'],
+            'category_ids' => ['sometimes', 'array'],
             'category_ids.*' => ['integer', Rule::exists('categories', 'id')],
         ];
     }

@@ -34,8 +34,8 @@ class ShopController extends Controller
             ->active()
             ->tap($inCategory)
             ->with(['brand', 'images'])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews' => fn ($r) => $r->visible()])
+            ->withAvg(['reviews' => fn ($r) => $r->visible()], 'rating')
             ->when($brandIds, fn ($q) => $q->whereIn('brand_id', $brandIds))
             ->when($request->filled('min_price'), fn ($q) => $q->where('base_price', '>=', $request->float('min_price')))
             ->when($request->filled('max_price'), fn ($q) => $q->where('base_price', '<=', $request->float('max_price')))
@@ -75,16 +75,20 @@ class ShopController extends Controller
     {
         $product->load([
             'brand', 'images', 'variants.color', 'variants.size',
-            'reviews.user', 'categories.parent', 'trending',
-        ])->loadCount('reviews')->loadAvg('reviews', 'rating')->loadSum('variants', 'stock_quantity');
+            'categories.parent', 'trending',
+            'reviews' => fn ($q) => $q->visible()->with('user'),
+        ])
+            ->loadCount(['reviews' => fn ($q) => $q->visible()])
+            ->loadAvg(['reviews' => fn ($q) => $q->visible()], 'rating')
+            ->loadSum('variants', 'stock_quantity');
 
         $related = Product::query()
             ->active()
             ->where('brand_id', $product->brand_id)
             ->whereKeyNot($product->id)
             ->with(['brand', 'images'])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews' => fn ($q) => $q->visible()])
+            ->withAvg(['reviews' => fn ($q) => $q->visible()], 'rating')
             ->limit(4)
             ->get();
 

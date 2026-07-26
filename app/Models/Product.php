@@ -15,13 +15,13 @@ use Illuminate\Support\Str;
  * A shoe model (Air Max 90, UltraBoost...). This is the central entity
  * of Feature 1 — the Detailed Product Page.
  *
- * @property int         $id
- * @property int         $brand_id
- * @property string      $name
- * @property string      $slug
+ * @property int $id
+ * @property int $brand_id
+ * @property string $name
+ * @property string $slug
  * @property string|null $description
- * @property float       $base_price
- * @property bool        $is_active
+ * @property float $base_price
+ * @property bool $is_active
  */
 class Product extends Model
 {
@@ -35,7 +35,7 @@ class Product extends Model
     {
         return [
             'base_price' => 'decimal:2',
-            'is_active'  => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -109,6 +109,16 @@ class Product extends Model
             ?? $this->variants()->sum('stock_quantity'));
     }
 
+    /** "out_of_stock" / "low_stock" / "in_stock" for the admin shoe list. */
+    public function getStockStatusAttribute(): string
+    {
+        return match (true) {
+            $this->total_stock <= 0 => 'out_of_stock',
+            $this->total_stock <= ProductVariant::LOW_STOCK_THRESHOLD => 'low_stock',
+            default => 'in_stock',
+        };
+    }
+
     /** Whether an admin has this product in the active trending set. */
     public function getIsTrendingAttribute(): bool
     {
@@ -117,5 +127,18 @@ class Product extends Model
         }
 
         return $this->trending()->where('is_active', true)->exists();
+    }
+
+    /**
+     * The variant to use when a caller wants to buy "the product" without
+     * picking a colour/size first (e.g. an "Add to cart" button on a
+     * wishlist card, which only knows the product, not a variant). Prefers
+     * an in-stock variant; falls back to any variant so an out-of-stock
+     * product can still surface a clear "no stock" message downstream.
+     */
+    public function defaultVariant(): ?ProductVariant
+    {
+        return $this->variants()->where('stock_quantity', '>', 0)->orderBy('id')->first()
+            ?? $this->variants()->orderBy('id')->first();
     }
 }

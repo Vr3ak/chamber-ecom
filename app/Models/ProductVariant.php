@@ -12,23 +12,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * product's base_price applies — the COALESCE(v.price, p.base_price)
  * logic from the Advanced SQL doc.
  *
- * @property int        $id
- * @property int        $product_id
- * @property int        $color_id
- * @property int        $size_id
+ * @property int $id
+ * @property int $product_id
+ * @property int $color_id
+ * @property int $size_id
  * @property float|null $price
- * @property int        $stock_quantity
+ * @property int $stock_quantity
  */
 class ProductVariant extends Model
 {
     use HasFactory;
+
+    /** Stock at or below this (but above 0) is "low_stock"; above it is "in_stock". */
+    public const LOW_STOCK_THRESHOLD = 10;
 
     protected $fillable = ['product_id', 'color_id', 'size_id', 'price', 'stock_quantity'];
 
     protected function casts(): array
     {
         return [
-            'price'          => 'decimal:2',
+            'price' => 'decimal:2',
             'stock_quantity' => 'integer',
         ];
     }
@@ -62,6 +65,16 @@ class ProductVariant extends Model
     public function getInStockAttribute(): bool
     {
         return $this->stock_quantity > 0;
+    }
+
+    /** "out_of_stock" / "low_stock" / "in_stock" for the admin stock column. */
+    public function getStatusAttribute(): string
+    {
+        return match (true) {
+            $this->stock_quantity <= 0 => 'out_of_stock',
+            $this->stock_quantity <= self::LOW_STOCK_THRESHOLD => 'low_stock',
+            default => 'in_stock',
+        };
     }
 
     /** Display label such as "Red / 42" (used by order_items later). */

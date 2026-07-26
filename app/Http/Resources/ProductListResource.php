@@ -17,22 +17,34 @@ class ProductListResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'          => $this->id,
-            'name'        => $this->name,
-            'slug'        => $this->slug,
-            'brand'       => $this->whenLoaded('brand', fn () => $this->brand->name),
-            'base_price'  => (float) $this->base_price,
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'brand' => $this->whenLoaded('brand', fn () => $this->brand->name),
+            'base_price' => (float) $this->base_price,
             // cheapest variant price if variants are loaded, else base price
-            'from_price'  => $this->whenLoaded('variants', function () {
+            'from_price' => $this->whenLoaded('variants', function () {
                 $prices = $this->variants->map(fn ($v) => (float) ($v->price ?? $this->base_price));
 
                 return $prices->isNotEmpty() ? $prices->min() : (float) $this->base_price;
             }),
-            'thumbnail'   => $this->whenLoaded('images', fn () => optional($this->images->first())->url),
+            'thumbnail' => $this->whenLoaded('images', fn () => optional($this->images->first())->url),
             // reviews_avg_rating / reviews_count come from withAvg()/withCount()
-            'avg_rating'    => $this->reviews_avg_rating !== null ? round((float) $this->reviews_avg_rating, 1) : null,
+            'avg_rating' => $this->reviews_avg_rating !== null ? round((float) $this->reviews_avg_rating, 1) : null,
             'reviews_count' => (int) ($this->reviews_count ?? 0),
-            'is_active'   => (bool) $this->is_active,
+            'is_active' => (bool) $this->is_active,
+            // admin shoe-list columns — populated when the controller adds
+            // withCount('variants') / withSum('variants', 'stock_quantity')
+            'total_stock' => $this->when(
+                $this->variants_sum_stock_quantity !== null || $this->relationLoaded('variants'),
+                fn () => $this->total_stock
+            ),
+            'stock_status' => $this->when(
+                $this->variants_sum_stock_quantity !== null || $this->relationLoaded('variants'),
+                fn () => $this->stock_status
+            ),
+            'variants_count' => $this->when($this->variants_count !== null, fn () => (int) $this->variants_count),
+            'categories' => $this->whenLoaded('categories', fn () => $this->categories->pluck('name')->values()),
         ];
     }
 }

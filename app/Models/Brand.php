@@ -10,16 +10,23 @@ use Illuminate\Support\Str;
 /**
  * A shoe manufacturer (Nike, Adidas, Puma...).
  *
- * @property int         $id
- * @property string      $name
- * @property string      $slug
+ * @property int $id
+ * @property string $name
+ * @property string $slug
  * @property string|null $logo_image
  */
 class Brand extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'logo_image'];
+    protected $fillable = ['name', 'slug', 'logo_image', 'is_active'];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
 
     protected static function booted(): void
     {

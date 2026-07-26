@@ -10,6 +10,8 @@ import {
     Search,
     Truck,
 } from 'lucide-react';
+import SiteFooter from '@/components/site-footer';
+import SiteNavbar from '@/components/site-navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -90,27 +92,24 @@ export default function Track({ query, notFound, order, timeline }: Props) {
     return (
         <>
             <Head title="Track your order — Chamber" />
-            <div className="min-h-screen bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
-                <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-5">
-                    <Link href="/" className="text-lg font-bold tracking-tight">
-                        Chamber
-                    </Link>
+            <div className="font-display flex min-h-screen flex-col bg-mist text-ink">
+                <SiteNavbar variant="dark" />
+
+                <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-10 pb-24">
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-1.5 text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-white"
+                        className="inline-flex items-center gap-1.5 text-sm text-slate transition-colors hover:text-gold"
                     >
                         <ArrowLeft className="h-4 w-4" />
                         Back to store
                     </Link>
-                </header>
 
-                <main className="mx-auto w-full max-w-3xl px-6 pb-24">
-                    <h1 className="mt-6 text-3xl font-bold tracking-tight">
+                    <h1 className="mt-6 text-2xl font-semibold">
                         Track your order
                     </h1>
-                    <p className="mt-2 text-[#706f6c] dark:text-[#A1A09A]">
+                    <p className="mt-2 text-sm text-slate">
                         Enter your order number (e.g.{' '}
-                        <code className="rounded bg-black/5 px-1.5 py-0.5 text-sm dark:bg-white/10">
+                        <code className="rounded bg-black/5 px-1.5 py-0.5 text-sm">
                             CH-2026-0001
                         </code>
                         ) to see its fulfilment timeline.
@@ -121,10 +120,10 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
                             placeholder="Order number"
-                            className="flex-1"
+                            className="h-11 flex-1 rounded-[6px] border-line"
                             autoFocus
                         />
-                        <Button type="submit">
+                        <Button type="submit" variant="gold" size="field">
                             <Search className="h-4 w-4" />
                             Track
                         </Button>
@@ -140,17 +139,17 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                     {order && (
                         <div className="mt-8 space-y-6">
                             {/* Summary */}
-                            <section className="rounded-xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-[#161615]">
+                            <section className="rounded-lg border border-line p-5">
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div>
-                                        <p className="text-xs font-medium tracking-wide text-[#706f6c] uppercase dark:text-[#A1A09A]">
+                                        <p className="text-xs font-medium tracking-wide text-slate uppercase">
                                             Order
                                         </p>
                                         <p className="text-xl font-bold">
                                             {order.order_number}
                                         </p>
                                         {order.placed_at && (
-                                            <p className="mt-1 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                                            <p className="mt-1 text-sm text-slate">
                                                 Placed{' '}
                                                 {formatTime(order.placed_at)}
                                             </p>
@@ -171,22 +170,22 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                         <p className="mt-2 text-lg font-bold">
                                             ${order.total.toFixed(2)}
                                         </p>
-                                        <p className="text-xs text-[#706f6c] dark:text-[#A1A09A]">
+                                        <p className="text-xs text-slate">
                                             {order.is_paid ? 'Paid' : 'Unpaid'}
                                         </p>
                                     </div>
                                 </div>
 
                                 {order.shipping.address && (
-                                    <div className="mt-4 flex items-start gap-2 border-t border-black/5 pt-4 text-sm dark:border-white/5">
-                                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#706f6c] dark:text-[#A1A09A]" />
+                                    <div className="mt-4 flex items-start gap-2 border-t border-line pt-4 text-sm">
+                                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate" />
                                         <span>
                                             <span className="font-medium">
                                                 {order.shipping.name}
                                             </span>{' '}
                                             · {order.shipping.address}
                                             {order.tracking_number && (
-                                                <span className="mt-0.5 block text-[#706f6c] dark:text-[#A1A09A]">
+                                                <span className="mt-0.5 block text-slate">
                                                     Tracking #
                                                     {order.tracking_number}
                                                 </span>
@@ -196,7 +195,7 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                 )}
 
                                 {order.items.length > 0 && (
-                                    <ul className="mt-4 space-y-2 border-t border-black/5 pt-4 text-sm dark:border-white/5">
+                                    <ul className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
                                         {order.items.map((it) => (
                                             <li
                                                 key={it.id}
@@ -205,7 +204,7 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                                 <span>
                                                     {it.quantity}×{' '}
                                                     {it.product_name}
-                                                    <span className="text-[#706f6c] dark:text-[#A1A09A]">
+                                                    <span className="text-slate">
                                                         {' '}
                                                         ({it.variant_label})
                                                     </span>
@@ -220,12 +219,12 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                             </section>
 
                             {/* Timeline */}
-                            <section className="rounded-xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-[#161615]">
+                            <section className="rounded-lg border border-line p-5">
                                 <h2 className="mb-4 font-semibold">
                                     Fulfilment timeline
                                 </h2>
                                 {timeline.length === 0 ? (
-                                    <p className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                                    <p className="text-sm text-slate">
                                         No tracking updates yet.
                                     </p>
                                 ) : (
@@ -247,7 +246,7 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                                             <Icon className="h-4 w-4" />
                                                         </span>
                                                         {!last && (
-                                                            <span className="mt-1 w-px grow bg-black/10 dark:bg-white/10" />
+                                                            <span className="mt-1 w-px grow bg-line" />
                                                         )}
                                                     </div>
                                                     <div className="pb-1">
@@ -255,17 +254,17 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                                             {meta.label}
                                                         </p>
                                                         {row.note && (
-                                                            <p className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                                                            <p className="text-sm text-slate">
                                                                 {row.note}
                                                             </p>
                                                         )}
-                                                        <p className="mt-0.5 text-xs text-[#706f6c] dark:text-[#A1A09A]">
+                                                        <p className="mt-0.5 text-xs text-slate">
                                                             {formatTime(
                                                                 row.time,
                                                             )}
                                                         </p>
                                                         {row.notification && (
-                                                            <span className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-black/5 px-2 py-1 text-xs text-[#706f6c] dark:bg-white/10 dark:text-[#A1A09A]">
+                                                            <span className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-black/5 px-2 py-1 text-xs text-slate">
                                                                 <Mail className="h-3 w-3" />
                                                                 Email{' '}
                                                                 {
@@ -285,6 +284,8 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                         </div>
                     )}
                 </main>
+
+                <SiteFooter />
             </div>
         </>
     );

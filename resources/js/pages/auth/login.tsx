@@ -11,9 +11,6 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
-const goldButton =
-    'bg-[#ffd369] text-[#222831] hover:bg-[#ffd369]/90 font-semibold';
-
 type Props = {
     status?: string;
     canResetPassword: boolean;
@@ -63,7 +60,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                 {canResetPassword && (
                                     <TextLink
                                         href={request()}
-                                        className="ml-auto text-sm text-[#808080] hover:text-[#222831]"
+                                        className="ml-auto text-[13px] font-medium text-ink hover:text-gold"
                                         tabIndex={5}
                                     >
                                         Forgot password?
@@ -73,7 +70,9 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <Button
                                 type="submit"
-                                className={`mt-2 w-full ${goldButton}`}
+                                variant="gold"
+                                size="field"
+                                className="mt-2 w-full"
                                 tabIndex={3}
                                 disabled={processing}
                                 data-test="login-button"
@@ -83,12 +82,12 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-[#808080]">
+                        <div className="text-center text-sm text-slate">
                             Don't have an account?{' '}
                             <TextLink
                                 href={register()}
                                 tabIndex={4}
-                                className="font-semibold text-[#222831]"
+                                className="font-medium text-ink hover:text-gold"
                             >
                                 Sign Up
                             </TextLink>

@@ -13,6 +13,25 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
+    /* Chamber storefront — palette and type from the Figma
+       (file lYFodIoMASp6u77RNTqXa8). These sit alongside the shadcn
+       tokens below: the admin shell (dashboard) keeps the shadcn theme,
+       the storefront and account pages use these. The Figma has no dark
+       variant, so pages built on these tokens are light-only. */
+    --font-display: 'IBM Plex Serif', ui-serif, Georgia, serif;
+
+    --color-ink: #222831; /* headers, hero, footer */
+    --color-slate: #393e46; /* hero panel, body copy */
+    --color-mist: #eeeeee; /* page background, text on ink */
+    --color-gold: #ffd369; /* accent, CTAs, wordmark */
+    --color-fog: #b3b3b3; /* secondary text on ink */
+    --color-dim: #808080; /* tertiary text */
+    --color-line: #e4e4e7; /* hairline borders */
+
+    /* Figma frames are 1440 wide with 64px gutters → 1312 of content.
+       Uses the --container-* namespace so `max-w-shell` resolves. */
+    --container-shell: 82rem;
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);

@@ -18,18 +18,17 @@ export default function SiteNavbar({
     const { auth } = usePage<{ auth: { user: unknown } }>().props;
     const dark = variant === 'dark';
 
-    const bar = dark ? 'bg-[#222831]' : 'border-b border-[#e4e4e7] bg-white';
-    const navText = dark ? 'text-[#eeeeee]' : 'text-[#222831]';
-    const icon = dark ? 'text-[#b3b3b3]' : 'text-[#393e46]';
+    const bar = dark ? 'bg-ink' : 'bg-white';
+    const navText = dark ? 'text-mist' : 'text-ink';
+    const icon = dark ? 'text-fog' : 'text-slate';
 
     return (
         <header
-            className={`flex h-[88px] items-center justify-between px-6 lg:px-16 ${bar}`}
-            style={{ fontFamily: '"IBM Plex Serif", serif' }}
+            className={`font-display flex h-[88px] items-center justify-between border-b border-line px-6 lg:px-16 ${bar}`}
         >
             {/* Logo — 1/3 width so the nav stays centered on the header */}
             <div className="flex-1">
-                <Link href="/" className="text-xl font-bold text-[#ffd369]">
+                <Link href="/" className="text-xl font-bold text-gold">
                     Chamber
                 </Link>
             </div>
@@ -37,13 +36,13 @@ export default function SiteNavbar({
             <nav
                 className={`hidden items-center gap-12 text-[15px] font-medium md:flex ${navText}`}
             >
-                <Link href="/men" className="transition-colors hover:text-[#ffd369]">
+                <Link href="/men" className="transition-colors hover:text-gold">
                     Men
                 </Link>
-                <Link href="/women" className="transition-colors hover:text-[#ffd369]">
+                <Link href="/women" className="transition-colors hover:text-gold">
                     Women
                 </Link>
-                <Link href="/kids" className="transition-colors hover:text-[#ffd369]">
+                <Link href="/kids" className="transition-colors hover:text-gold">
                     Kids
                 </Link>
             </nav>
@@ -54,15 +53,15 @@ export default function SiteNavbar({
                 <Link
                     href={auth.user ? dashboard() : login()}
                     aria-label={auth.user ? 'My account' : 'Log in'}
-                    className="transition-colors hover:text-[#ffd369]"
+                    className="transition-colors hover:text-gold"
                 >
                     <User className="h-[18px] w-[18px]" />
                 </Link>
                 <Heart className="h-[18px] w-[18px]" aria-hidden />
                 <span className="relative" aria-hidden>
-                    <ShoppingBag className="h-[18px] w-[18px]" />
+                    <ShoppingBag className="h-[22px] w-[22px]" />
                     {cartCount > 0 && (
-                        <span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ffd369] px-1 text-[9px] font-bold text-[#222831]">
+                        <span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[9px] font-bold text-ink">
                             {cartCount}
                         </span>
                     )}

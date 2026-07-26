@@ -30,89 +30,102 @@ export default function Payment({ order, payment, qrImage, merchant }: Props) {
     return (
         <>
             <Head title={`Pay ${order.order_number} — Chamber`} />
-            <div
-                className="min-h-screen bg-[#eeeeee] text-[#222831]"
-                style={{ fontFamily: '"IBM Plex Serif", serif' }}
-            >
+            <div className="font-display min-h-screen bg-mist text-ink">
                 <SiteNavbar variant="dark" />
 
-                <main className="mx-auto w-full max-w-[1440px] px-6 pt-10 pb-16 lg:px-16">
-                    <h1 className="text-2xl font-semibold">Complete Your Payment</h1>
+                <main className="mx-auto w-full max-w-shell px-6 pt-10 pb-16 lg:px-16">
+                    <h1 className="text-2xl font-semibold">
+                        Complete Your Payment
+                    </h1>
 
                     <div className="mt-6 grid gap-8 lg:grid-cols-2">
-                        {/* ---- QR card ---- */}
-                        <section className="rounded-lg border border-[#e4e4e7] px-6 py-10">
-                            <h2 className="text-lg font-semibold">Scan to Pay with KHQR</h2>
-                            <p className="mt-3 text-sm text-[#393e46]">
+                        {/* ---- QR card — Figma node 48:2173 ---- */}
+                        <section className="flex flex-col gap-6 rounded-lg border border-line px-6 py-10">
+                            <h2 className="text-lg font-semibold">
+                                Scan to Pay with KHQR
+                            </h2>
+                            <p className="text-sm text-slate">
                                 Open your banking app and scan the code below
                             </p>
 
-                            <div className="mt-6 flex flex-col items-center gap-3 rounded-lg border border-[#e4e4e7] bg-white px-6 py-10">
+                            <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-xl border border-line">
                                 <img
                                     src={qrImage}
                                     alt={`KHQR code for order ${order.order_number}`}
-                                    className="h-[200px] w-[200px]"
+                                    className="h-[204px] w-[204px] rounded-lg"
                                 />
-                                <p className="text-xs text-[#393e46]">
+                                <p className="text-xs text-slate">
                                     {merchant} · {money(order.total)}
                                 </p>
                             </div>
 
-                            <p className="mt-6 text-center text-xs text-[#6b7280]">
-                                This is a real Bakong KHQR payload. Settlement is simulated —
-                                confirming below marks the order paid.
+                            <p className="text-center text-xs text-slate">
+                                This is a real Bakong KHQR payload. Settlement is
+                                simulated — confirming below marks the order paid.
                             </p>
 
                             <button
                                 type="button"
                                 onClick={confirm}
                                 disabled={processing}
-                                className="mt-6 w-full rounded-md bg-[#ffd369] py-3 text-sm font-semibold text-[#222831] transition-opacity hover:opacity-90 disabled:opacity-50"
+                                className="w-full rounded-[6px] bg-gold py-3 text-[15px] font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
                             >
-                                {processing ? 'Confirming…' : "I've completed the payment"}
+                                {processing
+                                    ? 'Confirming…'
+                                    : "I've completed the payment"}
                             </button>
 
                             {errors.payment && (
-                                <p className="mt-3 text-center text-sm text-[#dc2626]">
+                                <p className="text-center text-sm text-[#dc2626]">
                                     {errors.payment}
                                 </p>
                             )}
                         </section>
 
-                        {/* ---- summary + status ---- */}
+                        {/* ---- summary + status — Figma node 48:2188 ---- */}
                         <div className="flex flex-col gap-5">
-                            <section className="rounded-lg border border-[#e4e4e7] p-6">
-                                <h2 className="font-semibold">Order Summary</h2>
-                                <dl className="mt-4 space-y-3 text-sm">
+                            <section className="flex flex-col gap-4 rounded-lg border border-line p-6">
+                                <h2 className="text-[15px] font-semibold">
+                                    Order Summary
+                                </h2>
+                                <dl className="space-y-3 text-[13px]">
                                     <div className="flex justify-between">
-                                        <dt className="text-[#393e46]">Order</dt>
+                                        <dt className="text-slate">Order</dt>
                                         <dd>{order.order_number}</dd>
                                     </div>
                                     <div className="flex justify-between">
-                                        <dt className="text-[#393e46]">Subtotal</dt>
+                                        <dt className="text-slate">Subtotal</dt>
                                         <dd>{money(order.subtotal)}</dd>
                                     </div>
                                 </dl>
-                                <div className="mt-4 flex justify-between border-t border-[#e4e4e7] pt-4">
-                                    <span className="font-semibold">Total</span>
-                                    <span className="text-xl font-bold">{money(order.total)}</span>
+                                <div className="flex items-center justify-between border-t border-line pt-4">
+                                    <span className="text-base font-semibold">
+                                        Total
+                                    </span>
+                                    <span className="text-xl font-bold">
+                                        {money(order.total)}
+                                    </span>
                                 </div>
                             </section>
 
-                            <section className="rounded-lg border border-[#e4e4e7] p-6">
-                                <h2 className="font-semibold">Payment Status</h2>
-                                <div className="mt-4 flex items-baseline justify-between gap-4 text-sm">
-                                    <span className="text-[#393e46]">Transaction Ref</span>
+                            <section className="flex flex-col gap-4 rounded-lg border border-line p-6">
+                                <h2 className="text-[15px] font-semibold">
+                                    Payment Status
+                                </h2>
+                                <div className="flex items-baseline justify-between gap-4 text-[13px]">
+                                    <span className="text-slate">
+                                        Transaction Ref
+                                    </span>
                                     <span className="truncate font-mono text-xs">
                                         {payment.transaction_ref}
                                     </span>
                                 </div>
-                                <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#dcdcdc]">
-                                    <div className="h-full w-1/3 rounded-full bg-[#4b9b6e]" />
+                                <div className="h-1.5 overflow-hidden rounded-full bg-[#c3ddc5]">
+                                    <div className="h-full w-1/3 rounded-full bg-[#46a344]" />
                                 </div>
-                                <p className="mt-3 text-sm text-[#393e46]">
-                                    Waiting for payment. Once confirmed, your order moves to
-                                    tracking.
+                                <p className="text-xs text-slate">
+                                    We'll confirm your order automatically once
+                                    payment is detected.
                                 </p>
                             </section>
                         </div>

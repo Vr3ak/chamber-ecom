@@ -9,9 +9,6 @@ import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
-const goldButton =
-    'bg-[#ffd369] text-[#222831] hover:bg-[#ffd369]/90 font-semibold';
-
 type Props = {
     passwordRules: string;
 };
@@ -105,7 +102,9 @@ export default function Register({ passwordRules }: Props) {
 
                             <Button
                                 type="submit"
-                                className={`mt-2 w-full ${goldButton}`}
+                                variant="gold"
+                                size="field"
+                                className="mt-2 w-full"
                                 tabIndex={6}
                                 data-test="register-user-button"
                             >
@@ -114,12 +113,12 @@ export default function Register({ passwordRules }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-[#808080]">
+                        <div className="text-center text-sm text-slate">
                             Already have an account?{' '}
                             <TextLink
                                 href={login()}
                                 tabIndex={7}
-                                className="font-semibold text-[#222831]"
+                                className="font-medium text-ink hover:text-gold"
                             >
                                 Log In
                             </TextLink>

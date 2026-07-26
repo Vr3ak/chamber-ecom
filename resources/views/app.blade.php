@@ -36,6 +36,14 @@
 
         @fonts
 
+        {{-- IBM Plex Serif is the Chamber storefront display face (Figma).
+             Without this the serif styling silently fell back to Georgia. --}}
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link
+            rel="stylesheet"
+            href="https://fonts.bunny.net/css?family=ibm-plex-serif:400,500,600,700&display=swap"
+        >
+
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         <x-inertia::head>

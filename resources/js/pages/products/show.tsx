@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { Minus, Plus, Star } from 'lucide-react';
+import { Heart, Minus, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
 import ProductCard, {
     ProductSummary,
@@ -36,15 +37,13 @@ type Product = {
     total_stock?: number;
 };
 
-const serif = { fontFamily: '"IBM Plex Serif", serif' } as const;
-
 function Stars({ value }: { value: number }) {
     return (
         <span className="inline-flex">
             {[1, 2, 3, 4, 5].map((n) => (
                 <Star
                     key={n}
-                    className={`h-4 w-4 ${n <= Math.round(value) ? 'fill-[#ffd369] text-[#ffd369]' : 'text-[#d4d4d8]'}`}
+                    className={`h-4 w-4 ${n <= Math.round(value) ? 'fill-gold text-gold' : 'text-[#d4d4d8]'}`}
                 />
             ))}
         </span>
@@ -76,63 +75,63 @@ export default function ProductShow({
     }
 
     return (
-        <div className="min-h-screen bg-white text-[#222831]" style={serif}>
+        <div className="font-display min-h-screen bg-mist text-ink">
             <Head title={`${product.name} — Chamber`} />
             <SiteNavbar variant="dark" />
 
-            <div className="mx-auto w-full max-w-6xl px-6 py-8 lg:px-16">
-                {/* Breadcrumb */}
-                <nav className="text-sm text-[#808080]">
-                    <Link href="/" className="hover:text-[#ffd369]">
+            <div className="mx-auto w-full max-w-shell px-6 pt-8 pb-16 lg:px-16">
+                {/* Breadcrumb — Figma node 43:299 */}
+                <nav className="flex flex-wrap gap-1.5 text-[13px] text-slate">
+                    <Link href="/" className="hover:text-gold">
                         Home
                     </Link>
                     {product.breadcrumbs?.[0]?.map((c) => (
-                        <span key={c.slug}>
-                            <span className="mx-2">/</span>
+                        <span key={c.slug} className="flex gap-1.5">
+                            <span>/</span>
                             <Link
                                 href={`/${c.slug}`}
-                                className="hover:text-[#ffd369]"
+                                className="hover:text-gold"
                             >
                                 {c.name}
                             </Link>
                         </span>
                     ))}
-                    <span className="mx-2">/</span>
-                    <span className="text-[#222831]">{product.name}</span>
+                    <span>/</span>
+                    <span className="font-medium text-ink">{product.name}</span>
                 </nav>
 
-                <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
-                    {/* Gallery */}
-                    <div>
+                <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+                    {/* Gallery — Figma node 43:306 */}
+                    <div className="flex flex-col gap-3">
                         <div
-                            className={`flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br ${tileGradient(product.id)}`}
+                            className={`flex aspect-[600/520] items-center justify-center rounded-[10px] bg-gradient-to-br ${tileGradient(product.id)}`}
                         >
                             <span className="text-2xl font-semibold text-white/90 drop-shadow">
                                 {product.name}
                             </span>
                         </div>
-                        <div className="mt-3 grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 gap-3">
                             {[0, 1, 2, 3].map((i) => (
                                 <div
                                     key={i}
-                                    className={`aspect-square rounded-md bg-gradient-to-br opacity-70 ${tileGradient(product.id + i)}`}
+                                    className={`aspect-[132/96] rounded-[6px] bg-gradient-to-br opacity-70 ${tileGradient(product.id + i)} ${i === 0 ? 'ring-2 ring-ink' : ''}`}
                                 />
                             ))}
                         </div>
                     </div>
 
-                    {/* Info */}
+                    {/* Info — Figma node 43:313 */}
                     <div>
                         {product.brand && (
-                            <p className="text-sm text-[#808080]">
+                            <p className="text-[13px] text-slate">
                                 {product.brand.name}
                             </p>
                         )}
-                        <h1 className="mt-1 text-4xl font-bold">
+                        <h1 className="mt-3 text-[32px] leading-tight font-bold">
                             {product.name}
                         </h1>
 
-                        <div className="mt-3 flex items-center gap-2 text-sm text-[#393e46]">
+                        <div className="mt-4 flex items-center gap-2 text-[13px] text-slate">
                             <Stars value={product.rating.average ?? 0} />
                             <span>
                                 {product.rating.average ?? '—'} (
@@ -140,18 +139,18 @@ export default function ProductShow({
                             </span>
                         </div>
 
-                        <p className="mt-4 text-2xl font-bold">
+                        <p className="mt-4 text-[28px] font-bold">
                             ${product.base_price.toFixed(2)}
                         </p>
 
-                        <hr className="my-6 border-[#e4e4e7]" />
+                        <hr className="my-5 border-line" />
 
                         {/* Colours */}
                         {colors.length > 0 && (
-                            <div className="mb-5">
-                                <p className="mb-2 text-sm font-medium">
+                            <div className="mb-5 flex flex-col gap-2.5">
+                                <p className="text-sm font-medium">
                                     Color:{' '}
-                                    <span className="text-[#808080]">
+                                    <span className="font-normal text-slate">
                                         {activeColor?.name}
                                     </span>
                                 </p>
@@ -161,7 +160,7 @@ export default function ProductShow({
                                             key={c.id}
                                             aria-label={c.name}
                                             onClick={() => setColor(c.id)}
-                                            className={`h-8 w-8 rounded-full border-2 ${color === c.id ? 'border-[#222831]' : 'border-[#e4e4e7]'}`}
+                                            className={`h-8 w-8 rounded-full border-2 ${color === c.id ? 'border-ink' : 'border-line'}`}
                                             style={{
                                                 backgroundColor:
                                                     c.hex_code ?? '#ccc',
@@ -174,16 +173,14 @@ export default function ProductShow({
 
                         {/* Sizes */}
                         {sizes.length > 0 && (
-                            <div className="mb-6">
-                                <p className="mb-2 text-sm font-medium">
-                                    Size:
-                                </p>
+                            <div className="mb-5 flex flex-col gap-2.5">
+                                <p className="text-sm font-medium">Size:</p>
                                 <div className="flex flex-wrap gap-2">
                                     {sizes.map((s) => (
                                         <button
                                             key={s.id}
                                             onClick={() => setSize(s.id)}
-                                            className={`min-w-[48px] rounded-md border px-3 py-2 text-sm ${size === s.id ? 'border-[#222831] bg-[#222831] text-white' : 'border-[#e4e4e7] text-[#222831] hover:border-[#222831]'}`}
+                                            className={`rounded-[6px] border px-3.5 py-2 text-sm font-medium ${size === s.id ? 'border-ink bg-ink text-white' : 'border-line text-ink hover:border-ink'}`}
                                         >
                                             {s.label}
                                         </button>
@@ -192,24 +189,24 @@ export default function ProductShow({
                             </div>
                         )}
 
-                        {/* Quantity + Add to cart */}
+                        {/* Quantity + Add to cart — Figma node 43:351 */}
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center rounded-md border border-[#e4e4e7]">
+                            <div className="flex h-12 w-[100px] items-center justify-between rounded-[6px] border border-line px-3">
                                 <button
                                     onClick={() =>
                                         setQty((q) => Math.max(1, q - 1))
                                     }
-                                    className="px-3 py-2 text-[#393e46] hover:text-[#222831]"
+                                    className="text-slate hover:text-ink"
                                     aria-label="Decrease quantity"
                                 >
                                     <Minus className="h-4 w-4" />
                                 </button>
-                                <span className="w-8 text-center text-sm">
+                                <span className="text-base font-medium">
                                     {qty}
                                 </span>
                                 <button
                                     onClick={() => setQty((q) => q + 1)}
-                                    className="px-3 py-2 text-[#393e46] hover:text-[#222831]"
+                                    className="text-slate hover:text-ink"
                                     aria-label="Increase quantity"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -217,28 +214,42 @@ export default function ProductShow({
                             </div>
                             <button
                                 onClick={addToCart}
-                                className="flex-1 rounded-md bg-[#ffd369] px-6 py-3 font-semibold text-[#222831] transition-opacity hover:opacity-90"
+                                className="h-12 flex-1 rounded-[6px] bg-gold px-6 text-[15px] font-medium text-ink transition-opacity hover:opacity-90"
                             >
                                 Add to Cart
+                            </button>
+                            {/* ponytail: same stub as Add to Cart — the wishlist
+                                endpoint exists but has no UI flow yet. */}
+                            <button
+                                onClick={() =>
+                                    toast('Wishlist isn’t available yet — coming soon.')
+                                }
+                                aria-label="Add to wishlist"
+                                className="flex h-12 w-12 items-center justify-center rounded-[6px] border border-line text-slate transition-colors hover:border-ink hover:text-ink"
+                            >
+                                <Heart className="h-5 w-5" />
                             </button>
                         </div>
 
                         {typeof product.total_stock === 'number' && (
-                            <p className="mt-3 text-xs text-[#808080]">
+                            <p className="mt-3 text-xs text-dim">
                                 {product.total_stock} in stock
                             </p>
                         )}
 
                         {/* Description */}
                         {product.description && (
-                            <div className="mt-8">
-                                <h2 className="mb-2 font-semibold">
-                                    Description
-                                </h2>
-                                <p className="text-sm leading-relaxed text-[#393e46]">
-                                    {product.description}
-                                </p>
-                            </div>
+                            <>
+                                <hr className="my-5 border-line" />
+                                <div className="flex flex-col gap-2">
+                                    <h2 className="text-base font-semibold">
+                                        Description
+                                    </h2>
+                                    <p className="text-sm leading-relaxed text-slate">
+                                        {product.description}
+                                    </p>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -246,12 +257,12 @@ export default function ProductShow({
                 {/* Reviews */}
                 {product.reviews && product.reviews.length > 0 && (
                     <section className="mt-14">
-                        <h2 className="mb-4 text-xl font-bold">Reviews</h2>
+                        <h2 className="mb-4 text-2xl font-semibold">Reviews</h2>
                         <div className="space-y-4">
                             {product.reviews.map((r) => (
                                 <div
                                     key={r.id}
-                                    className="rounded-lg border border-[#e4e4e7] p-4"
+                                    className="rounded-lg border border-line p-4"
                                 >
                                     <div className="flex items-center gap-2">
                                         <Stars value={r.rating} />
@@ -259,13 +270,13 @@ export default function ProductShow({
                                             {r.author ?? 'Anonymous'}
                                         </span>
                                         {r.created_at && (
-                                            <span className="text-xs text-[#808080]">
+                                            <span className="text-xs text-dim">
                                                 {r.created_at}
                                             </span>
                                         )}
                                     </div>
                                     {r.body && (
-                                        <p className="mt-2 text-sm text-[#393e46]">
+                                        <p className="mt-2 text-sm text-slate">
                                             {r.body}
                                         </p>
                                     )}
@@ -278,7 +289,7 @@ export default function ProductShow({
                 {/* Related */}
                 {related.length > 0 && (
                     <section className="mt-14">
-                        <h2 className="mb-6 text-xl font-bold">
+                        <h2 className="mb-6 text-2xl font-semibold">
                             You might also like
                         </h2>
                         <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
@@ -289,6 +300,8 @@ export default function ProductShow({
                     </section>
                 )}
             </div>
+
+            <SiteFooter />
         </div>
     );
 }

@@ -1,7 +1,9 @@
-import { FormEvent, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
+import type { ProductSummary } from '@/components/product-card';
+import ProductCard from '@/components/product-card';
 import SiteNavbar from '@/components/site-navbar';
-import ProductCard, { ProductSummary } from '@/components/product-card';
 
 type Facets = {
     brands: { id: number; name: string; products_count: number }[];
@@ -78,6 +80,7 @@ export default function Category({
         const next = list.includes(id)
             ? list.filter((x) => x !== id)
             : [...list, id];
+
         return next.join(',') || undefined;
     }
 
@@ -92,11 +95,12 @@ export default function Category({
     function pageLink(page: number) {
         const params = new URLSearchParams(window.location.search);
         params.set('page', String(page));
+
         return `/${gender}?${params.toString()}`;
     }
 
     return (
-        <div className="font-display min-h-screen bg-mist text-ink">
+        <div className="min-h-screen bg-mist font-display text-ink">
             <Head title={`${title} — Chamber`} />
             <SiteNavbar variant="dark" />
 
@@ -166,6 +170,7 @@ export default function Category({
                                         const on = active.size_id.includes(
                                             s.id,
                                         );
+
                                         return (
                                             <button
                                                 key={s.id}

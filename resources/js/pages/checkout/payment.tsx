@@ -30,7 +30,7 @@ export default function Payment({ order, payment, qrImage, merchant }: Props) {
     return (
         <>
             <Head title={`Pay ${order.order_number} — Chamber`} />
-            <div className="font-display min-h-screen bg-mist text-ink">
+            <div className="min-h-screen bg-mist font-display text-ink">
                 <SiteNavbar variant="dark" />
 
                 <main className="mx-auto w-full max-w-shell px-6 pt-10 pb-16 lg:px-16">
@@ -60,8 +60,9 @@ export default function Payment({ order, payment, qrImage, merchant }: Props) {
                             </div>
 
                             <p className="text-center text-xs text-slate">
-                                This is a real Bakong KHQR payload. Settlement is
-                                simulated — confirming below marks the order paid.
+                                This is a real Bakong KHQR payload. Settlement
+                                is simulated — confirming below marks the order
+                                paid.
                             </p>
 
                             <button

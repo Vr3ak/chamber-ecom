@@ -1,13 +1,11 @@
-import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Heart, Minus, Plus, Star } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
+import type { ProductSummary } from '@/components/product-card';
+import ProductCard, { tileGradient } from '@/components/product-card';
 import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
-import ProductCard, {
-    ProductSummary,
-    tileGradient,
-} from '@/components/product-card';
 
 type Option = {
     id: number;
@@ -68,14 +66,16 @@ export default function ProductShow({
     function addToCart() {
         if (!size) {
             toast.error('Please choose a size first.');
+
             return;
         }
+
         // ponytail: cart isn't built yet — this stubs the Figma action.
         toast('Cart isn’t available yet — coming soon.');
     }
 
     return (
-        <div className="font-display min-h-screen bg-mist text-ink">
+        <div className="min-h-screen bg-mist font-display text-ink">
             <Head title={`${product.name} — Chamber`} />
             <SiteNavbar variant="dark" />
 
@@ -222,7 +222,9 @@ export default function ProductShow({
                                 endpoint exists but has no UI flow yet. */}
                             <button
                                 onClick={() =>
-                                    toast('Wishlist isn’t available yet — coming soon.')
+                                    toast(
+                                        'Wishlist isn’t available yet — coming soon.',
+                                    )
                                 }
                                 aria-label="Add to wishlist"
                                 className="flex h-12 w-12 items-center justify-center rounded-[6px] border border-line text-slate transition-colors hover:border-ink hover:text-ink"

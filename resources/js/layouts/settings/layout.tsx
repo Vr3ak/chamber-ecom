@@ -25,7 +25,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (
-        <div className="font-display flex min-h-screen flex-col bg-mist text-ink">
+        <div className="flex min-h-screen flex-col bg-mist font-display text-ink">
             <Head title="My Account" />
             <SiteNavbar variant="dark" />
 
@@ -72,7 +72,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     {/* Figma's account fields are 13px labels over 44px
                         inputs (node 48:2090); scope it here so the shared
                         shadcn Input keeps its defaults elsewhere. */}
-                    <div className="flex-1 space-y-5 [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-ink [&_input]:h-11 [&_input]:rounded-[6px] [&_input]:border-line [&_input]:text-sm">
+                    <div className="flex-1 space-y-5 [&_input]:h-11 [&_input]:rounded-[6px] [&_input]:border-line [&_input]:text-sm [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-ink">
                         {children}
                     </div>
                 </div>

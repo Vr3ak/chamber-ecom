@@ -1,4 +1,3 @@
-import { FormEvent, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeft,
@@ -10,11 +9,13 @@ import {
     Search,
     Truck,
 } from 'lucide-react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
 import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 type TimelineNotification = {
     channel: string;
@@ -71,8 +72,12 @@ const STAGE_META: Record<string, { label: string; icon: typeof Check }> = {
 };
 
 function formatTime(value: string | null): string {
-    if (!value) return '';
+    if (!value) {
+        return '';
+    }
+
     const d = new Date(value.replace(' ', 'T'));
+
     return Number.isNaN(d.getTime())
         ? value
         : d.toLocaleString(undefined, {
@@ -92,7 +97,7 @@ export default function Track({ query, notFound, order, timeline }: Props) {
     return (
         <>
             <Head title="Track your order — Chamber" />
-            <div className="font-display flex min-h-screen flex-col bg-mist text-ink">
+            <div className="flex min-h-screen flex-col bg-mist font-display text-ink">
                 <SiteNavbar variant="dark" />
 
                 <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-10 pb-24">
@@ -236,6 +241,7 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                             const Icon = meta.icon;
                                             const last =
                                                 i === timeline.length - 1;
+
                                             return (
                                                 <li
                                                     key={`${row.stage}-${i}`}

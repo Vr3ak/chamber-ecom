@@ -24,7 +24,7 @@ export default function SiteNavbar({
 
     return (
         <header
-            className={`font-display flex h-[88px] items-center justify-between border-b border-line px-6 lg:px-16 ${bar}`}
+            className={`flex h-[88px] items-center justify-between border-b border-line px-6 font-display lg:px-16 ${bar}`}
         >
             {/* Logo — 1/3 width so the nav stays centered on the header */}
             <div className="flex-1">
@@ -39,15 +39,23 @@ export default function SiteNavbar({
                 <Link href="/men" className="transition-colors hover:text-gold">
                     Men
                 </Link>
-                <Link href="/women" className="transition-colors hover:text-gold">
+                <Link
+                    href="/women"
+                    className="transition-colors hover:text-gold"
+                >
                     Women
                 </Link>
-                <Link href="/kids" className="transition-colors hover:text-gold">
+                <Link
+                    href="/kids"
+                    className="transition-colors hover:text-gold"
+                >
                     Kids
                 </Link>
             </nav>
 
-            <div className={`flex flex-1 items-center justify-end gap-6 ${icon}`}>
+            <div
+                className={`flex flex-1 items-center justify-end gap-6 ${icon}`}
+            >
                 {/* ponytail: inert until search/wishlist/cart features exist */}
                 <Search className="h-[18px] w-[18px]" aria-hidden />
                 <Link

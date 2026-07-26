@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, Star } from 'lucide-react';
-import ProductCard, { ProductSummary } from '@/components/product-card';
+import type { ProductSummary } from '@/components/product-card';
+import ProductCard from '@/components/product-card';
 import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
 
@@ -25,7 +26,7 @@ export default function Welcome() {
     return (
         <>
             <Head title="Chamber — Sneakers & Running Shoes" />
-            <div className="font-display min-h-screen bg-mist text-ink">
+            <div className="min-h-screen bg-mist font-display text-ink">
                 <SiteNavbar variant="dark" />
 
                 {/* Hero — Figma node 161:278: 560px band, 640px text column. */}
@@ -60,11 +61,16 @@ export default function Welcome() {
                         </div>
                         <dl className="flex gap-10 pt-5">
                             {STATS.map(([value, label]) => (
-                                <div key={label} className="flex flex-col gap-0.5">
+                                <div
+                                    key={label}
+                                    className="flex flex-col gap-0.5"
+                                >
                                     <dt className="text-xl font-bold text-gold">
                                         {value}
                                     </dt>
-                                    <dd className="text-xs text-dim">{label}</dd>
+                                    <dd className="text-xs text-dim">
+                                        {label}
+                                    </dd>
                                 </div>
                             ))}
                         </dl>

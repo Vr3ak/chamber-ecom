@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Wishlist\AddWishlistItemRequest;
 use App\Http\Resources\WishlistResource;
-use App\Models\Cart;
 use App\Models\Wishlist;
 use App\Models\WishlistItem;
 use Illuminate\Http\JsonResponse;
@@ -28,9 +27,9 @@ class WishlistController extends Controller
         $wishlist = $this->loadDetail(Wishlist::defaultFor($request->user()));
 
         if (! $this->wantsJson($request)) {
+            // The navbar badge comes from the shared `cartCount` prop.
             return Inertia::render('shop/wishlist', [
                 'wishlist' => WishlistResource::make($wishlist)->resolve(),
-                'cartCount' => Cart::activeFor($request->user())->items()->sum('quantity'),
             ]);
         }
 

@@ -73,7 +73,9 @@ return [
     |
     */
 
-    'home' => '/dashboard',
+    // Registration and login land on the storefront: everyone who signs up
+    // is a customer, and their account pages live under /settings.
+    'home' => '/',
 
     /*
     |--------------------------------------------------------------------------

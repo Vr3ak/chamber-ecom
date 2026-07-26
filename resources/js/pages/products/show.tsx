@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Heart, Minus, Plus, Star } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -6,6 +6,9 @@ import type { ProductSummary } from '@/components/product-card';
 import ProductCard, { tileGradient } from '@/components/product-card';
 import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
+import { login } from '@/routes';
+import cartItems from '@/routes/cart/items';
+import wishlistItems from '@/routes/wishlist/items';
 
 type Option = {
     id: number;
@@ -24,6 +27,13 @@ type Product = {
     brand?: { name: string };
     breadcrumbs?: { name: string; slug: string }[][];
     options?: { colors: Option[]; sizes: Option[] };
+    variants?: {
+        id: number;
+        color?: { id: number; name: string };
+        size?: { id: number; label: string };
+        stock_quantity: number;
+        in_stock: boolean;
+    }[];
     rating: { average: number | null; count: number };
     reviews?: {
         id: number;
@@ -55,23 +65,83 @@ export default function ProductShow({
     product: Product;
     related: ProductSummary[];
 }) {
+    const { auth } = usePage<{ auth: { user: unknown } }>().props;
     const colors = product.options?.colors ?? [];
     const sizes = product.options?.sizes ?? [];
+    const variants = product.variants ?? [];
     const [color, setColor] = useState<number | null>(colors[0]?.id ?? null);
     const [size, setSize] = useState<number | null>(null);
     const [qty, setQty] = useState(1);
 
     const activeColor = colors.find((c) => c.id === color);
 
+    // The cart stores variants, not products, so the chosen colour + size has
+    // to resolve to a real variant before anything can be added.
+    const selectedVariant =
+        variants.find(
+            (v) => v.color?.id === color && v.size?.id === size,
+        ) ?? null;
+
+    /** Sizes actually offered in the selected colour, and whether in stock. */
+    function sizeAvailability(sizeId: number) {
+        const variant = variants.find(
+            (v) => v.color?.id === color && v.size?.id === sizeId,
+        );
+
+        return {
+            exists: variant !== undefined,
+            inStock: (variant?.stock_quantity ?? 0) > 0,
+        };
+    }
+
     function addToCart() {
+        if (!auth.user) {
+            router.visit(login().url);
+
+            return;
+        }
+
         if (!size) {
             toast.error('Please choose a size first.');
 
             return;
         }
 
-        // ponytail: cart isn't built yet — this stubs the Figma action.
-        toast('Cart isn’t available yet — coming soon.');
+        if (!selectedVariant) {
+            toast.error('That colour and size combination is unavailable.');
+
+            return;
+        }
+
+        router.post(
+            cartItems.store().url,
+            { product_variant_id: selectedVariant.id, quantity: qty },
+            {
+                preserveScroll: true,
+                onSuccess: () => toast.success('Added to your cart.'),
+                onError: (errors) =>
+                    toast.error(
+                        errors.quantity ?? 'Could not add that to your cart.',
+                    ),
+            },
+        );
+    }
+
+    function addToWishlist() {
+        if (!auth.user) {
+            router.visit(login().url);
+
+            return;
+        }
+
+        router.post(
+            wishlistItems.store().url,
+            { product_id: product.id },
+            {
+                preserveScroll: true,
+                onSuccess: () => toast.success('Saved to your wishlist.'),
+            },
+        );
     }
 
     return (
@@ -176,15 +246,31 @@ export default function ProductShow({
                             <div className="mb-5 flex flex-col gap-2.5">
                                 <p className="text-sm font-medium">Size:</p>
                                 <div className="flex flex-wrap gap-2">
-                                    {sizes.map((s) => (
-                                        <button
-                                            key={s.id}
-                                            onClick={() => setSize(s.id)}
-                                            className={`rounded-[6px] border px-3.5 py-2 text-sm font-medium ${size === s.id ? 'border-ink bg-ink text-white' : 'border-line text-ink hover:border-ink'}`}
-                                        >
-                                            {s.label}
-                                        </button>
-                                    ))}
+                                    {sizes.map((s) => {
+                                        const { exists, inStock } =
+                                            sizeAvailability(s.id);
+                                        const disabled = !exists || !inStock;
+
+                                        return (
+                                            <button
+                                                key={s.id}
+                                                onClick={() => setSize(s.id)}
+                                                disabled={disabled}
+                                                title={
+                                                    disabled
+                                                        ? 'Not available in this colour'
+                                                        : undefined
+                                                }
+                                                className={`rounded-[6px] border px-3.5 py-2 text-sm font-medium ${
+                                                    size === s.id
+                                                        ? 'border-ink bg-ink text-white'
+                                                        : 'border-line text-ink hover:border-ink'
+                                                } ${disabled ? 'cursor-not-allowed text-slate line-through opacity-40 hover:border-line' : ''}`}
+                                            >
+                                                {s.label}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
@@ -218,14 +304,8 @@ export default function ProductShow({
                             >
                                 Add to Cart
                             </button>
-                            {/* ponytail: same stub as Add to Cart — the wishlist
-                                endpoint exists but has no UI flow yet. */}
                             <button
-                                onClick={() =>
-                                    toast(
-                                        'Wishlist isn’t available yet — coming soon.',
-                                    )
-                                }
+                                onClick={addToWishlist}
                                 aria-label="Add to wishlist"
                                 className="flex h-12 w-12 items-center justify-center rounded-[6px] border border-line text-slate transition-colors hover:border-ink hover:text-ink"
                             >

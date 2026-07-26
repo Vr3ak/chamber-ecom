@@ -21,19 +21,18 @@ type WishlistItem = {
 
 type Props = {
     wishlist: { id: number; name: string; items: WishlistItem[] };
-    cartCount: number;
 };
 
 const money = (n: number) =>
     n.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
 
-export default function WishlistPage({ wishlist, cartCount }: Props) {
+export default function WishlistPage({ wishlist }: Props) {
     const saved = wishlist.items.filter((i) => i.product);
 
     return (
         <div className="flex min-h-screen flex-col bg-mist font-display text-ink">
             <Head title="My Wishlist — Chamber" />
-            <SiteNavbar variant="dark" cartCount={cartCount} />
+            <SiteNavbar variant="dark" />
 
             <main className="mx-auto w-full max-w-shell flex-1 px-6 pt-12 pb-16 lg:px-16">
                 {/* Title row — Figma node 31:21 */}

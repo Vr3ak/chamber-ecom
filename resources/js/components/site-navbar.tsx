@@ -1,22 +1,27 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Heart, Search, ShoppingBag, User } from 'lucide-react';
-import { dashboard, login } from '@/routes';
+import { login } from '@/routes';
+import { edit as editProfile } from '@/routes/profile';
 
 // Chamber navbar — the Header component from Figma (node 48:2052): wordmark,
 // centered Men/Women/Kids, and four right-side icons.
 //
-// Search / wishlist / cart have no backend yet, so those three render inert
-// (aria-hidden) rather than linking somewhere broken. The account icon is the
-// real auth entry point — login when signed out, dashboard when signed in.
+// The account icon is the auth entry point: login when signed out, the
+// "My Account" pages when signed in.
 export default function SiteNavbar({
     variant = 'dark',
-    cartCount = 0,
+    cartCount,
 }: {
     variant?: 'dark' | 'light';
+    /** Overrides the shared count; the cart page passes its own live total. */
     cartCount?: number;
 }) {
-    const { auth } = usePage<{ auth: { user: unknown } }>().props;
+    const { auth, cartCount: sharedCartCount } = usePage<{
+        auth: { user: unknown };
+        cartCount: number;
+    }>().props;
     const dark = variant === 'dark';
+    const badge = cartCount ?? sharedCartCount ?? 0;
 
     const bar = dark ? 'bg-ink' : 'bg-white';
     const navText = dark ? 'text-mist' : 'text-ink';
@@ -64,7 +69,7 @@ export default function SiteNavbar({
                     <Search className="h-[18px] w-[18px]" />
                 </Link>
                 <Link
-                    href={auth.user ? dashboard() : login()}
+                    href={auth.user ? editProfile() : login()}
                     aria-label={auth.user ? 'My account' : 'Log in'}
                     className="transition-colors hover:text-gold"
                 >
@@ -85,9 +90,9 @@ export default function SiteNavbar({
                     className="relative transition-colors hover:text-gold"
                 >
                     <ShoppingBag className="h-[22px] w-[22px]" />
-                    {cartCount > 0 && (
+                    {badge > 0 && (
                         <span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[9px] font-bold text-ink">
-                            {cartCount}
+                            {badge}
                         </span>
                     )}
                 </Link>

@@ -65,10 +65,6 @@ Route::get('{gender}', [ShopController::class, 'category'])
     ->whereIn('gender', ['men', 'women', 'kids'])
     ->name('shop.category');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
-});
-
 // KHQR payment screen (Feature 3). Owner-scoped: the order comes from the
 // route and is checked against the session user, never from request input.
 Route::middleware('auth')->group(function () {

@@ -55,8 +55,11 @@ export default function Category({
     const [maxPrice, setMaxPrice] = useState(active.max_price ?? '');
 
     // Merge a partial filter change into the current query and navigate.
-    function apply(patch: Record<string, unknown>) {
-        const params: Record<string, unknown> = {
+    // Values are narrowed to `string | undefined` (rather than `unknown`) so
+    // the object satisfies Inertia's RequestPayload; every filter serialises
+    // to a query string anyway.
+    function apply(patch: Record<string, string | undefined>) {
+        const params: Record<string, string | undefined> = {
             brand_id: active.brand_id.join(',') || undefined,
             color_id: active.color_id.join(',') || undefined,
             size_id: active.size_id.join(',') || undefined,

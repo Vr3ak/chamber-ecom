@@ -272,10 +272,7 @@ export default function Checkout({ cart, addresses, user }: Props) {
                                     </div>
                                 </section>
 
-                                {/* Payment — Figma node 32:412.
-                                    Only KHQR is implemented (CheckoutPaymentController);
-                                    there is no card gateway, so that option is
-                                    shown disabled rather than faked. */}
+  
                                 <section className="flex flex-col gap-4 rounded-lg border border-line p-6">
                                     <h2 className="text-lg font-semibold">
                                         Payment Method
@@ -292,15 +289,6 @@ export default function Checkout({ cart, addresses, user }: Props) {
                                         </span>
                                         <span className="ml-auto text-[13px] text-slate">
                                             Scan to pay after placing the order
-                                        </span>
-                                    </div>
-                                    <div className="flex h-14 items-center gap-3 rounded-lg border border-line px-4 opacity-50">
-                                        <input type="radio" disabled />
-                                        <span className="text-[15px] font-medium">
-                                            Credit / Debit Card
-                                        </span>
-                                        <span className="ml-auto text-[13px] text-slate">
-                                            Not available yet
                                         </span>
                                     </div>
                                 </section>

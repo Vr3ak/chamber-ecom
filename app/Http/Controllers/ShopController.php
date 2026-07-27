@@ -71,6 +71,48 @@ class ShopController extends Controller
         ]);
     }
 
+    /**
+     * Search results (Figma node 48:3671). Same catalogue query as category(),
+     * matched on name / description / brand instead of scoped to a category.
+     */
+    public function search(Request $request)
+    {
+        $term = trim((string) $request->query('q', ''));
+
+        $products = Product::query()
+            ->active()
+            ->with(['brand', 'images'])
+            ->withCount(['reviews' => fn ($r) => $r->visible()])
+            ->withAvg(['reviews' => fn ($r) => $r->visible()], 'rating')
+            ->when($term !== '', function ($q) use ($term) {
+                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $term).'%';
+
+                $q->where(fn ($w) => $w
+                    ->where('name', 'like', $like)
+                    ->orWhere('description', 'like', $like)
+                    ->orWhereHas('brand', fn ($b) => $b->where('name', 'like', $like)));
+            })
+            ->when($request->input('sort') === 'price_asc', fn ($q) => $q->orderBy('base_price'))
+            ->when($request->input('sort') === 'price_desc', fn ($q) => $q->orderByDesc('base_price'))
+            ->when($request->input('sort') === 'top_rated', fn ($q) => $q->orderByDesc('reviews_avg_rating'))
+            ->when(in_array($request->input('sort'), [null, 'featured', 'newest'], true), fn ($q) => $q->latest())
+            ->paginate(12)
+            ->withQueryString();
+
+        return inertia('shop/search', [
+            'query' => $term,
+            'products' => ProductListResource::collection($products)->resolve(),
+            'pagination' => [
+                'current' => $products->currentPage(),
+                'last' => $products->lastPage(),
+                'total' => $products->total(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastItem(),
+            ],
+            'sort' => $request->input('sort', 'featured'),
+        ]);
+    }
+
     public function product(Product $product)
     {
         $product->load([

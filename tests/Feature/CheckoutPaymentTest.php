@@ -92,7 +92,7 @@ test('confirming marks the order paid and logs it on the tracking timeline', fun
 
     $this->actingAs($user)
         ->post(route('checkout.confirm', $payment))
-        ->assertRedirect(route('track', ['order' => $order->order_number]));
+        ->assertRedirect(route('checkout.confirmation', $order));
 
     expect($payment->fresh()->status)->toBe('succeeded')
         ->and($payment->fresh()->paid_at)->not->toBeNull()

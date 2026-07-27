@@ -43,7 +43,14 @@ class ProductDetailResource extends JsonResource
                 'is_primary' => (bool) $img->is_primary,
             ])->values()),
 
-            'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
+            // ->resolve() so this serialises as a plain list. A bare
+            // ::collection() nested inside a resource keeps JsonResource's
+            // "data" wrapper, which made `variants` an object rather than an
+            // array and broke every consumer that iterated it.
+            'variants' => $this->whenLoaded(
+                'variants',
+                fn () => ProductVariantResource::collection($this->variants)->resolve($request),
+            ),
 
             // Distinct colour & size options for the picker, derived from variants.
             'options' => $this->when($this->relationLoaded('variants'), fn () => [
@@ -67,7 +74,10 @@ class ProductDetailResource extends JsonResource
                 'count' => (int) ($this->reviews_count ?? 0),
             ],
 
-            'reviews' => ReviewResource::collection($this->whenLoaded('reviews')),
+            'reviews' => $this->whenLoaded(
+                'reviews',
+                fn () => ReviewResource::collection($this->reviews)->resolve($request),
+            ),
 
             'total_stock' => $this->when(
                 $this->variants_sum_stock_quantity !== null || $this->relationLoaded('variants'),

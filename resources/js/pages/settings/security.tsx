@@ -1,7 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import type { Props as ManagePasskeysProps } from '@/components/manage-passkeys';
 import ManagePasskeys from '@/components/manage-passkeys';
@@ -27,12 +26,13 @@ export default function Security(props: Props) {
 
             <h1 className="sr-only">Security settings</h1>
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
-                />
+            {/* Figma's Security card — node 48:2131 */}
+            <div className="space-y-4 rounded-lg border border-line p-6">
+                <h2 className="text-base font-semibold">Security</h2>
+                <p className="text-sm text-slate">
+                    Ensure your account is using a long, random password to stay
+                    secure
+                </p>
 
                 <Form
                     {...SecurityController.update.form()}

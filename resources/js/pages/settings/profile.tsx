@@ -2,7 +2,6 @@ import { Form, Head, usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,12 +29,12 @@ export default function Profile({
 
             <h1 className="sr-only">Profile settings</h1>
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Profile"
-                    description="Update your name and email address"
-                />
+            {/* Figma frames each account section as a bordered card
+                (node 48:2087) with a 16px semibold title. */}
+            <div className="space-y-4 rounded-lg border border-line p-6">
+                <h2 className="text-base font-semibold">
+                    Personal Information
+                </h2>
 
                 <Form
                     {...ProfileController.update.form()}
@@ -110,12 +109,14 @@ export default function Profile({
                                     </div>
                                 )}
 
-                            <div className="flex items-center gap-4">
+                            {/* Figma right-aligns the action row (node 48:2102). */}
+                            <div className="flex items-center justify-end gap-3">
                                 <Button
+                                    variant="gold"
                                     disabled={processing}
                                     data-test="update-profile-button"
                                 >
-                                    Save
+                                    Save Changes
                                 </Button>
                             </div>
                         </>

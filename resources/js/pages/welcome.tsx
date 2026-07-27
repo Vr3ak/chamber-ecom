@@ -1,14 +1,23 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, Star } from 'lucide-react';
+import type { ProductSummary } from '@/components/product-card';
+import ProductCard from '@/components/product-card';
+import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
-import ProductCard, { ProductSummary } from '@/components/product-card';
 
-const serif = { fontFamily: '"IBM Plex Serif", serif' } as const;
-
+// Figma pairs each category with an editorial photo. The seed ships no
+// image files, so these gradients stand in while keeping the card geometry
+// the design specifies (400×320 — a 240px tile over an 80px label bar).
 const CATEGORIES = [
     ['Men', 'men', 'from-slate-500 to-slate-700'],
     ['Women', 'women', 'from-rose-400 to-pink-600'],
     ['Kids', 'kids', 'from-amber-400 to-orange-600'],
+] as const;
+
+const STATS = [
+    ['2,000+', 'Products'],
+    ['50+', 'Brands'],
+    ['Free', 'Shipping $50+'],
 ] as const;
 
 export default function Welcome() {
@@ -17,55 +26,49 @@ export default function Welcome() {
     return (
         <>
             <Head title="Chamber — Sneakers & Running Shoes" />
-            <div
-                className="min-h-screen bg-[#f4f4f5] text-[#222831]"
-                style={serif}
-            >
+            <div className="min-h-screen bg-mist font-display text-ink">
                 <SiteNavbar variant="dark" />
 
-                {/* Hero */}
-                <section className="flex flex-col bg-[#222831] lg:flex-row lg:items-stretch">
-                    <div className="flex flex-col justify-center gap-5 px-6 py-14 lg:w-[640px] lg:px-24 lg:py-20">
-                        <span className="w-fit rounded-full border border-[#ffd369] bg-[#ffd369]/15 px-3.5 py-1.5 text-xs font-medium text-[#ffd369]">
+                {/* Hero — Figma node 161:278: 560px band, 640px text column. */}
+                <section className="flex flex-col bg-ink lg:h-[560px] lg:flex-row">
+                    <div className="flex flex-col justify-center gap-5 px-6 py-14 lg:w-[640px] lg:shrink-0 lg:pr-16 lg:pl-24">
+                        <span className="w-fit rounded-full border border-gold bg-gold/15 px-3.5 py-1.5 text-xs font-medium text-gold">
                             NEW ARRIVALS — 2026
                         </span>
                         <h1 className="text-5xl leading-tight font-bold lg:text-[52px]">
-                            <span className="block text-[#eee]">Step Into</span>
-                            <span className="block text-[#ffd369]">
-                                Your Stride
-                            </span>
+                            <span className="block text-mist">Step Into</span>
+                            <span className="block text-gold">Your Stride</span>
                         </h1>
-                        <p className="max-w-md text-base text-[#b3b3b3]">
+                        <p className="max-w-[440px] text-base text-fog">
                             Explore handpicked styles for Men, Women &amp; Kids.
                             <br />
                             Free shipping on orders over $50.
                         </p>
-                        <div className="mt-1 flex flex-wrap gap-4">
+                        <div className="flex flex-wrap items-center gap-4">
                             <a
                                 href="#trending"
-                                className="inline-flex items-center gap-2 rounded-md bg-[#ffd369] px-7 py-3.5 text-[15px] font-semibold text-[#222831] transition-opacity hover:opacity-90"
+                                className="inline-flex items-center gap-2 rounded-[6px] bg-gold px-7 py-3.5 text-[15px] font-semibold text-ink transition-opacity hover:opacity-90"
                             >
                                 Shop Now
                                 <ArrowRight className="h-4 w-4" />
                             </a>
                             <Link
                                 href="/men"
-                                className="inline-flex items-center gap-2 rounded-md border border-[#666] px-7 py-3.5 text-[15px] font-medium text-[#b3b3b3] transition-colors hover:border-[#ffd369] hover:text-[#ffd369]"
+                                className="inline-flex items-center gap-2 rounded-[6px] border border-[#666] px-7 py-3.5 text-[15px] font-medium text-fog transition-colors hover:border-gold hover:text-gold"
                             >
                                 Browse Collection
                             </Link>
                         </div>
-                        <dl className="mt-5 flex gap-10">
-                            {[
-                                ['2,000+', 'Products'],
-                                ['50+', 'Brands'],
-                                ['Free', 'Shipping $50+'],
-                            ].map(([value, label]) => (
-                                <div key={label}>
-                                    <dt className="text-xl font-bold text-[#ffd369]">
+                        <dl className="flex gap-10 pt-5">
+                            {STATS.map(([value, label]) => (
+                                <div
+                                    key={label}
+                                    className="flex flex-col gap-0.5"
+                                >
+                                    <dt className="text-xl font-bold text-gold">
                                         {value}
                                     </dt>
-                                    <dd className="text-xs text-[#808080]">
+                                    <dd className="text-xs text-dim">
                                         {label}
                                     </dd>
                                 </div>
@@ -73,40 +76,40 @@ export default function Welcome() {
                         </dl>
                     </div>
 
-                    {/* Hero visual — dark panel with deco circles + floating cards.
-                        The seed ships no real product photos, so the shoe area
-                        is a styled placeholder rather than an <img>. */}
-                    <div className="relative min-h-[360px] flex-1 overflow-hidden bg-[#393e46] lg:min-h-[560px]">
-                        <div className="absolute -top-20 right-10 h-[500px] w-[500px] rounded-full bg-[#ffd369]/5" />
-                        <div className="absolute bottom-16 -left-20 h-[200px] w-[200px] rounded-full bg-[#ffd369]/5" />
+                    {/* Hero visual — deco circles + floating cards. No real
+                        product photography in the seed, so the shoe area is a
+                        styled placeholder rather than an <img>. */}
+                    <div className="relative min-h-[360px] flex-1 overflow-hidden bg-slate lg:min-h-0">
+                        <div className="absolute -top-20 left-[350px] h-[500px] w-[500px] rounded-full bg-gold/5" />
+                        <div className="absolute top-[380px] -left-20 h-[200px] w-[200px] rounded-full bg-gold/5" />
                         <div className="absolute inset-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/40 to-indigo-600/40">
                             <span className="text-lg font-medium text-white/70">
                                 Air Glide Runner
                             </span>
                         </div>
-                        <div className="absolute bottom-14 left-6 rounded-[10px] bg-white px-4 py-3 shadow-lg">
-                            <p className="text-[11px] font-semibold text-[#ffd369]">
+                        <div className="absolute bottom-14 left-[55px] flex flex-col gap-1 rounded-[10px] bg-white px-4 py-3 shadow-lg">
+                            <p className="text-[11px] font-semibold text-gold">
                                 Best Seller
                             </p>
-                            <p className="text-sm font-bold text-[#222831]">
+                            <p className="text-sm font-bold text-ink">
                                 Air Glide Runner
                             </p>
-                            <p className="text-xs font-medium text-[#393e46]">
+                            <p className="text-xs font-medium text-slate">
                                 $59.00
                             </p>
                         </div>
-                        <div className="absolute right-6 bottom-6 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 shadow-lg">
-                            <Star className="h-3.5 w-3.5 fill-[#ffd369] text-[#ffd369]" />
-                            <span className="text-xs font-medium text-[#222831]">
+                        <div className="absolute right-6 bottom-6 inline-flex items-center gap-1.5 rounded-[20px] bg-white px-3 py-2 shadow-lg">
+                            <Star className="h-3.5 w-3.5 fill-gold text-gold" />
+                            <span className="text-xs font-medium text-ink">
                                 4.8 (2.3k reviews)
                             </span>
                         </div>
                     </div>
                 </section>
 
-                {/* Shop by Category */}
-                <section className="mx-auto w-full max-w-6xl px-6 py-16 lg:px-16">
-                    <h2 className="mb-8 text-2xl font-bold">
+                {/* Shop by Category — Figma node 29:20 */}
+                <section className="mx-auto w-full max-w-shell px-6 py-12 lg:px-16">
+                    <h2 className="mb-6 text-2xl font-semibold">
                         Shop by Category
                     </h2>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -114,13 +117,13 @@ export default function Welcome() {
                             <Link
                                 key={slug}
                                 href={`/${slug}`}
-                                className="group relative flex aspect-[4/3] items-end overflow-hidden rounded-xl"
+                                className="group flex flex-col overflow-hidden rounded-lg border border-line bg-mist"
                             >
                                 <div
-                                    className={`absolute inset-0 bg-gradient-to-br ${gradient} transition-transform duration-300 group-hover:scale-105`}
+                                    className={`aspect-[400/240] bg-gradient-to-br ${gradient} transition-transform duration-300 group-hover:scale-105`}
                                 />
-                                <div className="relative w-full bg-black/30 px-5 py-4">
-                                    <span className="text-lg font-semibold text-white">
+                                <div className="flex h-20 items-center px-4">
+                                    <span className="text-base font-medium text-ink transition-colors group-hover:text-gold">
                                         {label}'s Shoes
                                     </span>
                                 </div>
@@ -129,17 +132,17 @@ export default function Welcome() {
                     </div>
                 </section>
 
-                {/* Trending */}
+                {/* Trending — Figma node 29:35 */}
                 <section
                     id="trending"
-                    className="mx-auto w-full max-w-6xl px-6 pb-16 lg:px-16"
+                    className="mx-auto w-full max-w-shell px-6 pt-12 pb-16 lg:px-16"
                 >
-                    <h2 className="mb-8 text-2xl font-bold">
+                    <h2 className="mb-6 text-2xl font-semibold">
                         Trending Products
                     </h2>
 
                     {trending.length === 0 ? (
-                        <p className="text-[#393e46]">No trending shoes yet.</p>
+                        <p className="text-slate">No trending shoes yet.</p>
                     ) : (
                         <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
                             {trending.map((p) => (
@@ -149,24 +152,7 @@ export default function Welcome() {
                     )}
                 </section>
 
-                {/* Footer */}
-                <footer className="bg-[#222831] py-8 text-[#b3b3b3]">
-                    <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-6 text-sm sm:flex-row lg:px-16">
-                        <span className="font-bold text-[#ffd369]">
-                            Chamber
-                        </span>
-                        <span>
-                            © {new Date().getFullYear()} Chamber. All rights
-                            reserved.
-                        </span>
-                        <Link
-                            href="/track"
-                            className="transition-colors hover:text-[#ffd369]"
-                        >
-                            Track an order
-                        </Link>
-                    </div>
-                </footer>
+                <SiteFooter />
             </div>
         </>
     );

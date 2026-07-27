@@ -10,8 +10,11 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * The logged-in customer's shopping cart. Session-guarded (never accepts a
@@ -26,17 +29,23 @@ use Illuminate\Validation\ValidationException;
  */
 class CartController extends Controller
 {
-    public function show(Request $request): JsonResponse
+    public function show(Request $request): JsonResponse|Response
     {
-        $cart = Cart::activeFor($request->user());
+        $cart = $this->loadDetail(Cart::activeFor($request->user()));
+
+        if (! $this->wantsJson($request)) {
+            return Inertia::render('shop/cart', [
+                'cart' => CartResource::make($cart)->resolve(),
+            ]);
+        }
 
         // Force 200: JsonResource defaults to 201 when the underlying model
         // was just lazily created by activeFor(), which is an implementation
         // detail — a GET should never report "created" to the caller.
-        return CartResource::make($this->loadDetail($cart))->response()->setStatusCode(200);
+        return CartResource::make($cart)->response()->setStatusCode(200);
     }
 
-    public function addItem(AddCartItemRequest $request): CartResource
+    public function addItem(AddCartItemRequest $request): CartResource|RedirectResponse
     {
         $data = $request->validated();
         $cart = Cart::activeFor($request->user());
@@ -55,33 +64,46 @@ class CartController extends Controller
             $cart->items()->create(['product_variant_id' => $variant->id, 'quantity' => $quantity]);
         }
 
-        return CartResource::make($this->loadDetail($cart->fresh()));
+        return $this->respond($request, $cart->fresh());
     }
 
-    public function updateItem(UpdateCartItemRequest $request, CartItem $cartItem): CartResource
+    public function updateItem(UpdateCartItemRequest $request, CartItem $cartItem): CartResource|RedirectResponse
     {
         $this->authorizeOwner($request, $cartItem);
 
         $this->assertInStock($cartItem->variant, $request->validated('quantity'));
         $cartItem->update(['quantity' => $request->validated('quantity')]);
 
-        return CartResource::make($this->loadDetail($cartItem->cart));
+        return $this->respond($request, $cartItem->cart);
     }
 
-    public function removeItem(Request $request, CartItem $cartItem): CartResource
+    public function removeItem(Request $request, CartItem $cartItem): CartResource|RedirectResponse
     {
         $this->authorizeOwner($request, $cartItem);
 
         $cart = $cartItem->cart;
         $cartItem->delete();
 
-        return CartResource::make($this->loadDetail($cart));
+        return $this->respond($request, $cart);
     }
 
-    public function clear(Request $request): CartResource
+    public function clear(Request $request): CartResource|RedirectResponse
     {
         $cart = Cart::activeFor($request->user());
         $cart->items()->delete();
+
+        return $this->respond($request, $cart);
+    }
+
+    /**
+     * API callers get the cart resource back; the Inertia page just needs the
+     * redirect so its `cart` prop is re-resolved from show().
+     */
+    private function respond(Request $request, Cart $cart): CartResource|RedirectResponse
+    {
+        if (! $this->wantsJson($request)) {
+            return back();
+        }
 
         return CartResource::make($this->loadDetail($cart));
     }

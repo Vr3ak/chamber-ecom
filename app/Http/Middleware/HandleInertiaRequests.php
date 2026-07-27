@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,16 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            // Drives the navbar cart badge on every storefront page. Queried
+            // rather than via Cart::activeFor() so that merely loading a page
+            // never creates an empty cart row for a user who isn't shopping.
+            'cartCount' => fn () => $request->user()
+                ? (int) CartItem::query()
+                    ->whereHas('cart', fn ($q) => $q
+                        ->where('user_id', $request->user()->id)
+                        ->where('status', 'active'))
+                    ->sum('quantity')
+                : 0,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

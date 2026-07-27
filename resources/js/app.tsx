@@ -12,15 +12,23 @@ createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
+            // These all render their own chrome and must not be wrapped:
+            // storefront pages ship SiteNavbar/SiteFooter, admin pages ship
+            // AdminLayout (sidebar + topbar).
             case name === 'welcome':
             case name === 'track':
             case name.startsWith('shop/'):
             case name.startsWith('products/'):
+            case name.startsWith('checkout/'):
+            case name.startsWith('orders/'):
+            case name.startsWith('admin/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
+            // Figma frames the account pages with the storefront header and a
+            // bordered account nav (node 48:2051), not the admin sidebar.
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return SettingsLayout;
             default:
                 return AppLayout;
         }

@@ -16,7 +16,11 @@ class WishlistResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'items' => WishlistItemResource::collection($this->whenLoaded('items')),
+            // ->resolve() so this is a plain list — see CartResource.
+            'items' => $this->whenLoaded(
+                'items',
+                fn () => WishlistItemResource::collection($this->items)->resolve($request),
+            ),
         ];
     }
 }

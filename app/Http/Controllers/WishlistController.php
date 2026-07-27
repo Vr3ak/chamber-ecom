@@ -7,7 +7,10 @@ use App\Http\Resources\WishlistResource;
 use App\Models\Wishlist;
 use App\Models\WishlistItem;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * The logged-in customer's default wishlist. Session-guarded, same
@@ -19,15 +22,22 @@ use Illuminate\Http\Request;
  */
 class WishlistController extends Controller
 {
-    public function show(Request $request): JsonResponse
+    public function show(Request $request): JsonResponse|Response
     {
-        $wishlist = Wishlist::defaultFor($request->user());
+        $wishlist = $this->loadDetail(Wishlist::defaultFor($request->user()));
+
+        if (! $this->wantsJson($request)) {
+            // The navbar badge comes from the shared `cartCount` prop.
+            return Inertia::render('shop/wishlist', [
+                'wishlist' => WishlistResource::make($wishlist)->resolve(),
+            ]);
+        }
 
         // Force 200: see the identical comment in CartController::show.
-        return WishlistResource::make($this->loadDetail($wishlist))->response()->setStatusCode(200);
+        return WishlistResource::make($wishlist)->response()->setStatusCode(200);
     }
 
-    public function addItem(AddWishlistItemRequest $request): WishlistResource
+    public function addItem(AddWishlistItemRequest $request): WishlistResource|RedirectResponse
     {
         $wishlist = Wishlist::defaultFor($request->user());
         $productId = $request->validated('product_id');
@@ -37,15 +47,25 @@ class WishlistController extends Controller
             $wishlist->items()->create(['product_id' => $productId, 'created_at' => now()]);
         }
 
-        return WishlistResource::make($this->loadDetail($wishlist->fresh()));
+        return $this->respond($request, $wishlist->fresh());
     }
 
-    public function removeItem(Request $request, WishlistItem $wishlistItem): WishlistResource
+    public function removeItem(Request $request, WishlistItem $wishlistItem): WishlistResource|RedirectResponse
     {
         abort_if($wishlistItem->wishlist->user_id !== $request->user()->id, 404);
 
         $wishlist = $wishlistItem->wishlist;
         $wishlistItem->delete();
+
+        return $this->respond($request, $wishlist);
+    }
+
+    /** JSON for API callers, redirect-back for the Inertia page. */
+    private function respond(Request $request, Wishlist $wishlist): WishlistResource|RedirectResponse
+    {
+        if (! $this->wantsJson($request)) {
+            return back();
+        }
 
         return WishlistResource::make($this->loadDetail($wishlist));
     }

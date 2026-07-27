@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
 use App\Models\Size;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 /**
@@ -33,7 +34,7 @@ class ShopController extends Controller
         $products = Product::query()
             ->active()
             ->tap($inCategory)
-            ->with(['brand', 'images'])
+            ->with(['brand', 'images', 'trending'])
             ->withCount(['reviews' => fn ($r) => $r->visible()])
             ->withAvg(['reviews' => fn ($r) => $r->visible()], 'rating')
             ->when($brandIds, fn ($q) => $q->whereIn('brand_id', $brandIds))
@@ -44,6 +45,7 @@ class ShopController extends Controller
             ->when($request->input('sort') === 'price_asc', fn ($q) => $q->orderBy('base_price'))
             ->when($request->input('sort') === 'price_desc', fn ($q) => $q->orderByDesc('base_price'))
             ->when($request->input('sort') === 'top_rated', fn ($q) => $q->orderByDesc('reviews_avg_rating'))
+            ->when($request->input('sort') === 'trending', $this->sortByTrending(...))
             ->when(in_array($request->input('sort'), [null, 'featured', 'newest'], true), fn ($q) => $q->latest())
             ->paginate(9)
             ->withQueryString();
@@ -81,7 +83,7 @@ class ShopController extends Controller
 
         $products = Product::query()
             ->active()
-            ->with(['brand', 'images'])
+            ->with(['brand', 'images', 'trending'])
             ->withCount(['reviews' => fn ($r) => $r->visible()])
             ->withAvg(['reviews' => fn ($r) => $r->visible()], 'rating')
             ->when($term !== '', function ($q) use ($term) {
@@ -95,6 +97,7 @@ class ShopController extends Controller
             ->when($request->input('sort') === 'price_asc', fn ($q) => $q->orderBy('base_price'))
             ->when($request->input('sort') === 'price_desc', fn ($q) => $q->orderByDesc('base_price'))
             ->when($request->input('sort') === 'top_rated', fn ($q) => $q->orderByDesc('reviews_avg_rating'))
+            ->when($request->input('sort') === 'trending', $this->sortByTrending(...))
             ->when(in_array($request->input('sort'), [null, 'featured', 'newest'], true), fn ($q) => $q->latest())
             ->paginate(12)
             ->withQueryString();
@@ -138,6 +141,22 @@ class ShopController extends Controller
             'product' => ProductDetailResource::make($product)->resolve(),
             'related' => ProductListResource::collection($related)->resolve(),
         ]);
+    }
+
+    /**
+     * "Trending" sort: the shoes an admin has featured come first, in the
+     * sort_order they curated, and everything else follows. Ordering on the
+     * exists-flag first keeps the two groups apart without a raw NULLS LAST,
+     * and the id tie-breaks the (all-null) tail so pagination stays stable.
+     */
+    private function sortByTrending(Builder $query): Builder
+    {
+        return $query
+            ->withExists(['trending as is_trending_now' => fn ($t) => $t->where('is_active', true)])
+            ->withMin(['trending as trending_rank' => fn ($t) => $t->where('is_active', true)], 'sort_order')
+            ->orderByDesc('is_trending_now')
+            ->orderBy('trending_rank')
+            ->orderBy('id');
     }
 
     /** Filter facets scoped to the products in a category. */

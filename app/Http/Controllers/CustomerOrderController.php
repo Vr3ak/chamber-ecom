@@ -45,8 +45,9 @@ class CustomerOrderController extends Controller
 
         $order->load(['items.variant.product', 'payments', 'tracking']);
 
-        // Which line items this customer may still review: the order has to be
-        // delivered, and one review per product per customer.
+        // Which line items this customer may still review. An order can be
+        // reviewed at any stage; the only limit is one review per product
+        // per customer.
         $reviewed = Review::query()
             ->where('user_id', $request->user()->id)
             ->pluck('product_id')
@@ -55,17 +56,15 @@ class CustomerOrderController extends Controller
         return Inertia::render('orders/show', [
             'order' => OrderResource::make($order)->resolve(),
             'timeline' => OrderTrackingResource::collection($order->trackingTimeline())->resolve(),
-            'reviewable' => $order->status === 'delivered'
-                ? $order->items
-                    ->map(fn ($item) => [
-                        'order_item_id' => $item->id,
-                        'product_id' => $item->variant?->product_id,
-                        'product_name' => $item->product_name,
-                    ])
-                    ->filter(fn ($row) => $row['product_id'] && ! in_array($row['product_id'], $reviewed, true))
-                    ->values()
-                    ->all()
-                : [],
+            'reviewable' => $order->items
+                ->map(fn ($item) => [
+                    'order_item_id' => $item->id,
+                    'product_id' => $item->variant?->product_id,
+                    'product_name' => $item->product_name,
+                ])
+                ->filter(fn ($row) => $row['product_id'] && ! in_array($row['product_id'], $reviewed, true))
+                ->values()
+                ->all(),
         ]);
     }
 
@@ -73,7 +72,6 @@ class CustomerOrderController extends Controller
     public function review(Request $request, Order $order): RedirectResponse
     {
         abort_if($order->user_id !== $request->user()->id, 404);
-        abort_unless($order->status === 'delivered', 403, 'You can review an order once it has been delivered.');
 
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
@@ -89,7 +87,8 @@ class CustomerOrderController extends Controller
             'That product is not on this order.'
         );
 
-        // Reviews written from a delivered order are verified purchases.
+        // Written against one of the customer's own orders, so it still counts
+        // as a verified purchase whatever stage that order is at.
         Review::updateOrCreate(
             ['user_id' => $request->user()->id, 'product_id' => $data['product_id']],
             [

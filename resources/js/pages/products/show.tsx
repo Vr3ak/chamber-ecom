@@ -26,6 +26,12 @@ type Product = {
     is_trending: boolean;
     brand?: { name: string };
     breadcrumbs?: { name: string; slug: string }[][];
+    images?: {
+        url: string;
+        alt: string | null;
+        color_id: number | null;
+        is_primary: boolean;
+    }[];
     options?: { colors: Option[]; sizes: Option[] };
     variants?: {
         id: number;
@@ -72,15 +78,16 @@ export default function ProductShow({
     const [color, setColor] = useState<number | null>(colors[0]?.id ?? null);
     const [size, setSize] = useState<number | null>(null);
     const [qty, setQty] = useState(1);
+    const images = product.images ?? [];
+    const [activeImage, setActiveImage] = useState(0);
 
     const activeColor = colors.find((c) => c.id === color);
 
     // The cart stores variants, not products, so the chosen colour + size has
     // to resolve to a real variant before anything can be added.
     const selectedVariant =
-        variants.find(
-            (v) => v.color?.id === color && v.size?.id === size,
-        ) ?? null;
+        variants.find((v) => v.color?.id === color && v.size?.id === size) ??
+        null;
 
     /** Sizes actually offered in the selected colour, and whether in stock. */
     function sizeAvailability(sizeId: number) {
@@ -173,21 +180,59 @@ export default function ProductShow({
                 <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
                     {/* Gallery — Figma node 43:306 */}
                     <div className="flex flex-col gap-3">
-                        <div
-                            className={`flex aspect-[600/520] items-center justify-center rounded-[10px] bg-gradient-to-br ${tileGradient(product.id)}`}
-                        >
-                            <span className="text-2xl font-semibold text-white/90 drop-shadow">
-                                {product.name}
-                            </span>
-                        </div>
-                        <div className="grid grid-cols-4 gap-3">
-                            {[0, 1, 2, 3].map((i) => (
+                        {images.length > 0 ? (
+                            <>
+                                <div className="aspect-[600/520] overflow-hidden rounded-[10px] bg-white">
+                                    <img
+                                        src={images[activeImage].url}
+                                        alt={
+                                            images[activeImage].alt ??
+                                            product.name
+                                        }
+                                        className="h-full w-full object-cover"
+                                    />
+                                </div>
+                                {images.length > 1 && (
+                                    <div className="grid grid-cols-4 gap-3">
+                                        {images.map((img, i) => (
+                                            <button
+                                                key={img.url}
+                                                type="button"
+                                                onClick={() =>
+                                                    setActiveImage(i)
+                                                }
+                                                aria-label={`View image ${i + 1} of ${images.length}`}
+                                                className={`aspect-[132/96] overflow-hidden rounded-[6px] ${i === activeImage ? 'ring-2 ring-ink' : 'opacity-70'}`}
+                                            >
+                                                <img
+                                                    src={img.url}
+                                                    alt={img.alt ?? ''}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <>
                                 <div
-                                    key={i}
-                                    className={`aspect-[132/96] rounded-[6px] bg-gradient-to-br opacity-70 ${tileGradient(product.id + i)} ${i === 0 ? 'ring-2 ring-ink' : ''}`}
-                                />
-                            ))}
-                        </div>
+                                    className={`flex aspect-[600/520] items-center justify-center rounded-[10px] bg-gradient-to-br ${tileGradient(product.id)}`}
+                                >
+                                    <span className="text-2xl font-semibold text-white/90 drop-shadow">
+                                        {product.name}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-4 gap-3">
+                                    {[0, 1, 2, 3].map((i) => (
+                                        <div
+                                            key={i}
+                                            className={`aspect-[132/96] rounded-[6px] bg-gradient-to-br opacity-70 ${tileGradient(product.id + i)} ${i === 0 ? 'ring-2 ring-ink' : ''}`}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Info — Figma node 43:313 */}

@@ -1,4 +1,5 @@
 import { Link, router } from '@inertiajs/react';
+import { Flame } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import {
@@ -20,6 +21,7 @@ type Product = {
     brand: string | null;
     base_price: number;
     is_active: boolean;
+    is_trending: boolean;
     variants_count: number;
     stock: number;
 };
@@ -100,6 +102,12 @@ export default function AdminProducts({ query, products, pagination }: Props) {
                                     >
                                         {p.name}
                                     </Link>
+                                    {p.is_trending && (
+                                        <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-[11px] font-semibold text-ink">
+                                            <Flame className="h-3 w-3" />
+                                            Trending
+                                        </span>
+                                    )}
                                 </Cell>
                                 <Cell className="text-slate">
                                     {p.brand ?? '—'}

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Star } from 'lucide-react';
+import { Flame, Star } from 'lucide-react';
 
 export type ProductSummary = {
     id: number;
@@ -8,6 +8,9 @@ export type ProductSummary = {
     brand?: string;
     base_price?: number;
     from_price?: number;
+    thumbnail?: string | null;
+    /** Only sent on listings that eager-load the trending relation. */
+    is_trending?: boolean;
     avg_rating: number | null;
     reviews_count: number;
 };
@@ -54,12 +57,33 @@ export default function ProductCard({
             }
         >
             {/* Figma sizes the tile 304×260 (node 29:40) rather than square. */}
-            <div
-                className={`flex aspect-[304/260] items-center justify-center overflow-hidden bg-gradient-to-br ${framed ? '' : 'rounded-[6px]'} ${tileGradient(product.id)}`}
-            >
-                <span className="px-3 text-center text-base font-semibold text-white/90 drop-shadow">
-                    {product.name}
-                </span>
+            <div className="relative">
+                {product.thumbnail ? (
+                    <div
+                        className={`aspect-[304/260] overflow-hidden bg-white ${framed ? '' : 'rounded-[6px]'}`}
+                    >
+                        <img
+                            src={product.thumbnail}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                        />
+                    </div>
+                ) : (
+                    <div
+                        className={`flex aspect-[304/260] items-center justify-center overflow-hidden bg-gradient-to-br ${framed ? '' : 'rounded-[6px]'} ${tileGradient(product.id)}`}
+                    >
+                        <span className="px-3 text-center text-base font-semibold text-white/90 drop-shadow">
+                            {product.name}
+                        </span>
+                    </div>
+                )}
+
+                {product.is_trending && (
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[11px] font-semibold text-ink shadow-sm">
+                        <Flame className="h-3 w-3" />
+                        Trending
+                    </span>
+                )}
             </div>
             <div className={`flex flex-col gap-1 ${framed ? 'p-3' : 'pt-3'}`}>
                 <p className="text-[15px] font-medium text-ink transition-colors group-hover:text-gold">

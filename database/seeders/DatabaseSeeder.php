@@ -28,5 +28,8 @@ class DatabaseSeeder extends Seeder
 
         // Feature 3 sample order + payment history (Mission 5 scenario).
         $this->call(OrderSeeder::class);
+
+        // Cart + wishlist items so those endpoints have data to test against.
+        $this->call(CartWishlistSeeder::class);
     }
 }

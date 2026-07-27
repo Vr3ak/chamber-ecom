@@ -38,6 +38,7 @@ type Props = {
 
 const SORTS = [
     ['featured', 'Featured'],
+    ['trending', 'Trending'],
     ['price_asc', 'Price: Low to High'],
     ['price_desc', 'Price: High to Low'],
     ['top_rated', 'Top Rated'],

@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\Size;
+use App\Models\Trending;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,7 +31,7 @@ class ProductAdminController extends Controller
         $term = trim((string) $request->query('q', ''));
 
         $products = Product::query()
-            ->with('brand')
+            ->with(['brand', 'trending'])
             ->withCount('variants')
             ->withSum('variants', 'stock_quantity')
             ->when($term !== '', function ($q) use ($term) {
@@ -49,6 +52,7 @@ class ProductAdminController extends Controller
                 'brand' => $p->brand?->name,
                 'base_price' => (float) $p->base_price,
                 'is_active' => (bool) $p->is_active,
+                'is_trending' => (bool) $p->trending?->is_active,
                 'variants_count' => (int) $p->variants_count,
                 'stock' => (int) ($p->variants_sum_stock_quantity ?? 0),
             ])->all(),
@@ -66,7 +70,7 @@ class ProductAdminController extends Controller
 
     public function edit(Product $product): Response
     {
-        $product->load(['categories', 'variants.color', 'variants.size']);
+        $product->load(['categories', 'variants.color', 'variants.size', 'images', 'trending']);
 
         return Inertia::render('admin/products/form', [
             'product' => [
@@ -78,6 +82,8 @@ class ProductAdminController extends Controller
                 'brand_id' => $product->brand_id,
                 'is_active' => (bool) $product->is_active,
                 'category_ids' => $product->categories->pluck('id')->all(),
+                'image_url' => $product->images->first()?->url,
+                'is_trending' => (bool) $product->trending?->is_active,
             ],
             'options' => $this->options(),
         ]);
@@ -85,8 +91,15 @@ class ProductAdminController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $product = Product::create($this->validated($request));
+        $data = $this->validated($request);
+        $product = Product::create(collect($data)->except(['image', 'is_trending'])->all());
         $product->categories()->sync($request->input('category_ids', []));
+
+        if ($request->hasFile('image')) {
+            ProductImage::storeUpload($request->file('image'), $product->id, ['is_primary' => true]);
+        }
+
+        $this->syncTrending($request, $product);
 
         return redirect()
             ->route('admin.products.edit', $product)
@@ -95,8 +108,16 @@ class ProductAdminController extends Controller
 
     public function update(Request $request, Product $product): RedirectResponse
     {
-        $product->update($this->validated($request, $product));
+        $data = $this->validated($request, $product);
+        $product->update(collect($data)->except(['image', 'is_trending'])->all());
         $product->categories()->sync($request->input('category_ids', []));
+
+        if ($request->hasFile('image')) {
+            $product->images()->where('is_primary', true)->delete();
+            ProductImage::storeUpload($request->file('image'), $product->id, ['is_primary' => true]);
+        }
+
+        $this->syncTrending($request, $product);
 
         return back()->with('success', 'Product updated.');
     }
@@ -190,7 +211,41 @@ class ProductAdminController extends Controller
             'base_price' => ['required', 'numeric', 'min:0'],
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
             'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'max:5120'],
+            'is_trending' => ['boolean'],
         ]);
+    }
+
+    /**
+     * Feature (or un-feature) a shoe on the storefront's Trending rail.
+     *
+     * The row is kept and flipped rather than deleted so a shoe that gets
+     * re-featured keeps the position it was curated at. New entries go to the
+     * back of the rail. admin_id is best-effort: the panel authenticates a
+     * User, and only some of those have a matching row in the `admins` table
+     * this column references.
+     */
+    private function syncTrending(Request $request, Product $product): void
+    {
+        if (! $request->has('is_trending')) {
+            return;
+        }
+
+        $featured = $request->boolean('is_trending');
+        $existing = $product->trending()->first();
+
+        if (! $featured && ! $existing) {
+            return;
+        }
+
+        $product->trending()->updateOrCreate([], [
+            'is_active' => $featured,
+            'sort_order' => $existing->sort_order ?? ((int) Trending::max('sort_order') + 1),
+            'admin_id' => $existing->admin_id
+                ?? Admin::where('email', $request->user()->email)->value('id'),
+        ]);
+
+        $product->unsetRelation('trending');
     }
 
     /** @return array<string, mixed> */

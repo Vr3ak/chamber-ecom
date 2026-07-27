@@ -114,9 +114,17 @@ export default function CartPage({ cart }: { cart: Cart }) {
                                     key={item.id}
                                     className={`flex items-center gap-4 px-5 py-4 ${i < cart.items.length - 1 ? 'border-b border-line' : ''}`}
                                 >
-                                    <div
-                                        className={`h-20 w-20 shrink-0 rounded-[6px] bg-gradient-to-br ${tileGradient(item.product?.id ?? item.id)}`}
-                                    />
+                                    {item.product?.thumbnail ? (
+                                        <img
+                                            src={item.product.thumbnail}
+                                            alt={item.product.name}
+                                            className="h-20 w-20 shrink-0 rounded-[6px] object-cover"
+                                        />
+                                    ) : (
+                                        <div
+                                            className={`h-20 w-20 shrink-0 rounded-[6px] bg-gradient-to-br ${tileGradient(item.product?.id ?? item.id)}`}
+                                        />
+                                    )}
 
                                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                                         <Link

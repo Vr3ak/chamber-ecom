@@ -19,6 +19,9 @@ type Props = {
 // Write-a-Review modal — Figma node 48:3645.
 export default function WriteReviewModal({ orderId, product, onClose }: Props) {
     const [hovered, setHovered] = useState<number | null>(null);
+    // useForm reads this once on mount and never re-syncs it, so the caller
+    // must key this component by product to pick up a new product_id — see
+    // the note on <WriteReviewModal> in pages/orders/show.tsx.
     const { data, setData, post, processing, errors, reset } = useForm({
         product_id: product?.product_id ?? 0,
         rating: 5,
@@ -50,6 +53,7 @@ export default function WriteReviewModal({ orderId, product, onClose }: Props) {
                     <p className="text-sm text-slate">
                         {product?.product_name}
                     </p>
+                    <InputError message={errors.product_id} />
 
                     <div className="flex flex-col gap-1.5">
                         <span className="text-[13px] font-medium text-ink">

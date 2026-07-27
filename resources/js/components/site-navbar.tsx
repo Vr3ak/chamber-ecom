@@ -1,7 +1,14 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Heart, Search, ShoppingBag, User } from 'lucide-react';
+import {
+    Heart,
+    LayoutDashboard,
+    Search,
+    ShoppingBag,
+    User,
+} from 'lucide-react';
 import { login } from '@/routes';
 import { edit as editProfile } from '@/routes/profile';
+import type { Auth } from '@/types';
 
 // Chamber navbar — the Header component from Figma (node 48:2052): wordmark,
 // centered Men/Women/Kids, and four right-side icons.
@@ -17,7 +24,7 @@ export default function SiteNavbar({
     cartCount?: number;
 }) {
     const { auth, cartCount: sharedCartCount } = usePage<{
-        auth: { user: unknown };
+        auth: Auth;
         cartCount: number;
     }>().props;
     const dark = variant === 'dark';
@@ -96,6 +103,15 @@ export default function SiteNavbar({
                         </span>
                     )}
                 </Link>
+                {auth.user?.is_admin && (
+                    <Link
+                        href="/admin"
+                        aria-label="Admin dashboard"
+                        className="transition-colors hover:text-gold"
+                    >
+                        <LayoutDashboard className="h-[18px] w-[18px]" />
+                    </Link>
+                )}
             </div>
         </header>
     );

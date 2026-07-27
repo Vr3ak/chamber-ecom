@@ -66,8 +66,20 @@ export default function WishlistPage({ wishlist }: Props) {
                                 <div className="relative">
                                     <Link
                                         href={`/products/${item.product!.slug}`}
-                                        className={`block aspect-[304/260] bg-gradient-to-br ${tileGradient(item.product!.id)}`}
-                                    />
+                                        className="block aspect-[304/260] overflow-hidden"
+                                    >
+                                        {item.product!.thumbnail ? (
+                                            <img
+                                                src={item.product!.thumbnail}
+                                                alt={item.product!.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <div
+                                                className={`h-full w-full bg-gradient-to-br ${tileGradient(item.product!.id)}`}
+                                            />
+                                        )}
+                                    </Link>
                                     {/* Filled heart = remove (Figma node 31:29) */}
                                     <button
                                         onClick={() =>

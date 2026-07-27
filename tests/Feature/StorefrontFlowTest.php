@@ -133,10 +133,10 @@ test('a customer cannot view or pay for another customer\'s order', function () 
     $this->actingAs($intruder)->get(route('checkout.confirmation', $order))->assertNotFound();
 });
 
-test('a review can only be written against a delivered order the customer owns', function () {
+test('a review can be written against an order the customer owns, at any stage', function () {
     $user = User::factory()->create();
     $variant = ProductVariant::factory()->create(['stock_quantity' => 3]);
-    $order = Order::factory()->create(['user_id' => $user->id, 'status' => 'paid']);
+    $order = Order::factory()->create(['user_id' => $user->id, 'status' => 'pending']);
     $order->items()->create([
         'product_variant_id' => $variant->id,
         'product_name' => $variant->product->name,
@@ -148,13 +148,7 @@ test('a review can only be written against a delivered order the customer owns',
 
     $payload = ['product_id' => $variant->product_id, 'rating' => 5, 'body' => 'Great fit.'];
 
-    // Not delivered yet.
-    $this->actingAs($user)
-        ->post(route('orders.reviews.store', $order), $payload)
-        ->assertForbidden();
-
-    $order->update(['status' => 'delivered']);
-
+    // No need to wait for delivery — a pending order can be reviewed.
     $this->actingAs($user)
         ->post(route('orders.reviews.store', $order), $payload)
         ->assertRedirect();
@@ -164,6 +158,66 @@ test('a review can only be written against a delivered order the customer owns',
         ->and($review->is_verified)->toBeTrue()
         ->and($review->order_id)->toBe($order->id);
 });
+
+test('another customer cannot review against an order that is not theirs', function () {
+    $order = Order::factory()->create(['status' => 'delivered']);
+    $variant = ProductVariant::factory()->create();
+    $order->items()->create([
+        'product_variant_id' => $variant->id,
+        'product_name' => $variant->product->name,
+        'variant_label' => $variant->variant_label,
+        'unit_price' => 10,
+        'quantity' => 1,
+        'line_total' => 10,
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->post(route('orders.reviews.store', $order), [
+            'product_id' => $variant->product_id,
+            'rating' => 5,
+        ])
+        ->assertNotFound();
+
+    expect(Review::count())->toBe(0);
+});
+
+/**
+ * `reviewable` is what decides whether the order page renders a "Write a
+ * review" button at all, so the Order History → review path hinges on it.
+ */
+test('the order page offers a review right away, and not twice for the same shoe', function (string $status) {
+    $user = User::factory()->create();
+    $variant = ProductVariant::factory()->create(['stock_quantity' => 3]);
+    $order = Order::factory()->create(['user_id' => $user->id, 'status' => $status]);
+    $item = $order->items()->create([
+        'product_variant_id' => $variant->id,
+        'product_name' => $variant->product->name,
+        'variant_label' => $variant->variant_label,
+        'unit_price' => 10,
+        'quantity' => 1,
+        'line_total' => 10,
+    ]);
+
+    $reviewable = fn () => $this->actingAs($user)
+        ->get(route('orders.show', $order))
+        ->assertOk()
+        ->viewData('page')['props']['reviewable'];
+
+    // Offered whatever stage the order is at — no wait for delivery.
+    expect($reviewable())->toBe([[
+        'order_item_id' => $item->id,
+        'product_id' => $variant->product_id,
+        'product_name' => $variant->product->name,
+    ]]);
+
+    $this->actingAs($user)->post(route('orders.reviews.store', $order), [
+        'product_id' => $variant->product_id,
+        'rating' => 4,
+    ])->assertRedirect();
+
+    // One review per product per customer, so the button goes away.
+    expect($reviewable())->toBe([]);
+})->with(['pending', 'paid', 'shipped', 'delivered']);
 
 test('a customer cannot review a product that is not on their order', function () {
     $user = User::factory()->create();

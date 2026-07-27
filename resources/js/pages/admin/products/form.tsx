@@ -1,5 +1,5 @@
 import { Link, useForm } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Panel } from '@/components/admin/ui';
 import InputError from '@/components/input-error';
 import AdminLayout from '@/layouts/admin-layout';
@@ -16,6 +16,8 @@ type Props = {
         brand_id: number;
         is_active: boolean;
         category_ids: number[];
+        image_url: string | null;
+        is_trending: boolean;
     } | null;
     options: {
         brands: Option[];
@@ -46,7 +48,21 @@ export default function ProductForm({ product, options }: Props) {
         brand_id: product?.brand_id?.toString() ?? '',
         is_active: product?.is_active ?? true,
         category_ids: product?.category_ids ?? ([] as number[]),
+        image: null as File | null,
+        is_trending: product?.is_trending ?? false,
     });
+
+    const [imagePreview, setImagePreview] = useState<string | null>(
+        product?.image_url ?? null,
+    );
+
+    function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0] ?? null;
+        setData('image', file);
+        setImagePreview(
+            file ? URL.createObjectURL(file) : (product?.image_url ?? null),
+        );
+    }
 
     // Slug follows the name until the product exists; after that it's a real
     // URL that other things may link to, so it's left alone.
@@ -176,6 +192,27 @@ export default function ProductForm({ product, options }: Props) {
                             <InputError message={errors.description} />
                         </div>
 
+                        <div className="flex flex-col gap-1.5">
+                            <label className={labelCls} htmlFor="image">
+                                Image
+                            </label>
+                            {imagePreview && (
+                                <img
+                                    src={imagePreview}
+                                    alt="Shoe preview"
+                                    className="h-32 w-32 rounded-[6px] border border-line object-cover"
+                                />
+                            )}
+                            <input
+                                id="image"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="text-sm text-ink file:mr-3 file:rounded-[6px] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-medium"
+                            />
+                            <InputError message={errors.image} />
+                        </div>
+
                         <label className="flex items-center gap-2 text-sm">
                             <input
                                 type="checkbox"
@@ -185,6 +222,23 @@ export default function ProductForm({ product, options }: Props) {
                                 }
                             />
                             Visible in the storefront
+                        </label>
+
+                        <label className="flex items-center gap-2 text-sm">
+                            <input
+                                type="checkbox"
+                                checked={data.is_trending}
+                                onChange={(e) =>
+                                    setData('is_trending', e.target.checked)
+                                }
+                            />
+                            <span>
+                                Mark as trending
+                                <span className="block text-[13px] text-slate">
+                                    Features it on the homepage rail and adds a
+                                    Trending badge to its card.
+                                </span>
+                            </span>
                         </label>
                     </div>
                 </Panel>

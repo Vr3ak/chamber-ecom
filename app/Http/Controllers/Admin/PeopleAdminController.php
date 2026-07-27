@@ -78,7 +78,10 @@ class PeopleAdminController extends Controller
         $notifications = Notification::query()
             ->with(['order', 'user'])
             ->when($status, fn ($q) => $q->where('status', $status))
-            ->latest()
+            // The table has no timestamps (only sent_at, which is null until
+            // delivery), so latest() would order by a created_at that does not
+            // exist. Newest-first by id, matching Api\Admin\NotificationController.
+            ->orderByDesc('id')
             ->paginate(20)
             ->withQueryString();
 

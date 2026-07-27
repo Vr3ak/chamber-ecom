@@ -225,7 +225,12 @@ export default function OrderDetail({ order, timeline, reviewable }: Props) {
                 </div>
             </main>
 
+            {/* Keyed by product so the form remounts per shoe: useForm only
+                reads its initial data once, and this modal is mounted with
+                the page while `reviewing` is still null. Without the key the
+                submitted product_id stays 0 and the review silently fails. */}
             <WriteReviewModal
+                key={reviewing?.product_id ?? 'none'}
                 orderId={order.id}
                 product={reviewing}
                 onClose={() => setReviewing(null)}

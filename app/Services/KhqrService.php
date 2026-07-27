@@ -21,16 +21,19 @@ use BaconQrCode\Writer;
 class KhqrService
 {
     private string $accountId;
+
     private string $merchantName;
+
     private string $merchantCity;
+
     private string $currency;   // ISO 4217 numeric: 840 = USD, 116 = KHR
 
     public function __construct()
     {
-        $this->accountId    = (string) config('services.khqr.account_id', 'chamber@aclb');
+        $this->accountId = (string) config('services.khqr.account_id', 'chamber@aclb');
         $this->merchantName = (string) config('services.khqr.merchant_name', 'Chamber');
         $this->merchantCity = (string) config('services.khqr.merchant_city', 'Phnom Penh');
-        $this->currency     = (string) config('services.khqr.currency', '840');
+        $this->currency = (string) config('services.khqr.currency', '840');
     }
 
     /**
@@ -40,7 +43,7 @@ class KhqrService
     {
         $isDynamic = $amount > 0;
 
-        $p  = $this->tlv('00', '01');                       // payload format indicator
+        $p = $this->tlv('00', '01');                       // payload format indicator
         $p .= $this->tlv('01', $isDynamic ? '12' : '11');   // dynamic (12) vs static (11)
         $p .= $this->tlv('29', $this->tlv('00', $this->accountId)); // individual Bakong account
         $p .= $this->tlv('52', '5999');                     // merchant category code (misc retail)
@@ -52,6 +55,14 @@ class KhqrService
         $p .= $this->tlv('59', $this->clip($this->merchantName, 25));
         $p .= $this->tlv('60', $this->clip($this->merchantCity, 15));
         $p .= $this->tlv('62', $this->tlv('01', $this->clip($billRef, 25))); // bill number
+
+        if ($isDynamic) {
+            // Required for any dynamic KHQR: creation + expiration timestamps
+            // in milliseconds since epoch (13-digit strings).
+            $createdAt = (string) (int) floor(microtime(true) * 1000);
+            $expiresAt = (string) ((int) $createdAt + 15 * 60 * 1000); // 15-minute validity
+            $p .= $this->tlv('99', $this->tlv('00', $createdAt).$this->tlv('01', $expiresAt));
+        }
 
         $p .= '6304';                                       // CRC tag + length
         $p .= $this->crc16($p);                             // CRC value over everything above
@@ -68,7 +79,7 @@ class KhqrService
     /** Render the payload as an SVG QR code (no image extension needed). */
     public function qrSvg(string $payload, int $size = 300): string
     {
-        $writer = new Writer(new ImageRenderer(new RendererStyle($size), new SvgImageBackEnd()));
+        $writer = new Writer(new ImageRenderer(new RendererStyle($size), new SvgImageBackEnd));
 
         return $writer->writeString($payload);
     }

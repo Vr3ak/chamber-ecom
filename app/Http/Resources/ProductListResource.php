@@ -29,6 +29,12 @@ class ProductListResource extends JsonResource
                 return $prices->isNotEmpty() ? $prices->min() : (float) $this->base_price;
             }),
             'thumbnail' => $this->whenLoaded('images', fn () => optional($this->images->first())->url),
+            // Only when the relation is loaded — the accessor falls back to a
+            // per-product exists() query, which would be an N+1 across a grid.
+            'is_trending' => $this->when(
+                $this->relationLoaded('trending'),
+                fn () => $this->is_trending,
+            ),
             // reviews_avg_rating / reviews_count come from withAvg()/withCount()
             'avg_rating' => $this->reviews_avg_rating !== null ? round((float) $this->reviews_avg_rating, 1) : null,
             'reviews_count' => (int) ($this->reviews_count ?? 0),

@@ -73,10 +73,6 @@ class ShopController extends Controller
         ]);
     }
 
-    /**
-     * Search results (Figma node 48:3671). Same catalogue query as category(),
-     * matched on name / description / brand instead of scoped to a category.
-     */
     public function search(Request $request)
     {
         $term = trim((string) $request->query('q', ''));
@@ -143,12 +139,6 @@ class ShopController extends Controller
         ]);
     }
 
-    /**
-     * "Trending" sort: the shoes an admin has featured come first, in the
-     * sort_order they curated, and everything else follows. Ordering on the
-     * exists-flag first keeps the two groups apart without a raw NULLS LAST,
-     * and the id tie-breaks the (all-null) tail so pagination stays stable.
-     */
     private function sortByTrending(Builder $query): Builder
     {
         return $query
@@ -159,7 +149,7 @@ class ShopController extends Controller
             ->orderBy('id');
     }
 
-    /** Filter facets scoped to the products in a category. */
+
     private function facets(Category $category): array
     {
         $productIds = $category->products()->where('is_active', true)->pluck('products.id');

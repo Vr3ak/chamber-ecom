@@ -35,7 +35,6 @@ export default function Confirmation({ order }: { order: Order }) {
             <SiteNavbar variant="dark" />
 
             <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-12 pb-16">
-                {/* Confirmation hero — Figma node 48:3502 */}
                 <div className="flex flex-col items-center gap-4 text-center">
                     <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#46a344] text-white">
                         <Check className="h-8 w-8" />

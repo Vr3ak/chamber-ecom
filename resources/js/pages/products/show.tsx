@@ -83,13 +83,10 @@ export default function ProductShow({
 
     const activeColor = colors.find((c) => c.id === color);
 
-    // The cart stores variants, not products, so the chosen colour + size has
-    // to resolve to a real variant before anything can be added.
     const selectedVariant =
         variants.find((v) => v.color?.id === color && v.size?.id === size) ??
         null;
 
-    /** Sizes actually offered in the selected colour, and whether in stock. */
     function sizeAvailability(sizeId: number) {
         const variant = variants.find(
             (v) => v.color?.id === color && v.size?.id === sizeId,
@@ -157,7 +154,6 @@ export default function ProductShow({
             <SiteNavbar variant="dark" />
 
             <div className="mx-auto w-full max-w-shell px-6 pt-8 pb-16 lg:px-16">
-                {/* Breadcrumb — Figma node 43:299 */}
                 <nav className="flex flex-wrap gap-1.5 text-[13px] text-slate">
                     <Link href="/" className="hover:text-gold">
                         Home
@@ -178,7 +174,6 @@ export default function ProductShow({
                 </nav>
 
                 <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
-                    {/* Gallery — Figma node 43:306 */}
                     <div className="flex flex-col gap-3">
                         {images.length > 0 ? (
                             <>
@@ -235,7 +230,6 @@ export default function ProductShow({
                         )}
                     </div>
 
-                    {/* Info — Figma node 43:313 */}
                     <div>
                         {product.brand && (
                             <p className="text-[13px] text-slate">
@@ -260,7 +254,6 @@ export default function ProductShow({
 
                         <hr className="my-5 border-line" />
 
-                        {/* Colours */}
                         {colors.length > 0 && (
                             <div className="mb-5 flex flex-col gap-2.5">
                                 <p className="text-sm font-medium">
@@ -286,7 +279,6 @@ export default function ProductShow({
                             </div>
                         )}
 
-                        {/* Sizes */}
                         {sizes.length > 0 && (
                             <div className="mb-5 flex flex-col gap-2.5">
                                 <p className="text-sm font-medium">Size:</p>
@@ -320,7 +312,6 @@ export default function ProductShow({
                             </div>
                         )}
 
-                        {/* Quantity + Add to cart — Figma node 43:351 */}
                         <div className="flex items-center gap-3">
                             <div className="flex h-12 w-[100px] items-center justify-between rounded-[6px] border border-line px-3">
                                 <button
@@ -364,7 +355,6 @@ export default function ProductShow({
                             </p>
                         )}
 
-                        {/* Description */}
                         {product.description && (
                             <>
                                 <hr className="my-5 border-line" />
@@ -381,7 +371,6 @@ export default function ProductShow({
                     </div>
                 </div>
 
-                {/* Reviews */}
                 {product.reviews && product.reviews.length > 0 && (
                     <section className="mt-14">
                         <h2 className="mb-4 text-2xl font-semibold">Reviews</h2>
@@ -413,7 +402,6 @@ export default function ProductShow({
                     </section>
                 )}
 
-                {/* Related */}
                 {related.length > 0 && (
                     <section className="mt-14">
                         <h2 className="mb-6 text-2xl font-semibold">

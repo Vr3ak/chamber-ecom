@@ -5,9 +5,6 @@ import ProductCard from '@/components/product-card';
 import SiteFooter from '@/components/site-footer';
 import SiteNavbar from '@/components/site-navbar';
 
-// Figma pairs each category with an editorial photo. The seed ships no
-// image files, so these gradients stand in while keeping the card geometry
-// the design specifies (400×320 — a 240px tile over an 80px label bar).
 const CATEGORIES = [
     ['Men', 'men', 'from-slate-500 to-slate-700'],
     ['Women', 'women', 'from-rose-400 to-pink-600'],
@@ -29,7 +26,6 @@ export default function Welcome() {
             <div className="min-h-screen bg-mist font-display text-ink">
                 <SiteNavbar variant="dark" />
 
-                {/* Hero — Figma node 161:278: 560px band, 640px text column. */}
                 <section className="flex flex-col bg-ink lg:h-[560px] lg:flex-row">
                     <div className="flex flex-col justify-center gap-5 px-6 py-14 lg:w-[640px] lg:shrink-0 lg:pr-16 lg:pl-24">
                         <span className="w-fit rounded-full border border-gold bg-gold/15 px-3.5 py-1.5 text-xs font-medium text-gold">
@@ -76,9 +72,6 @@ export default function Welcome() {
                         </dl>
                     </div>
 
-                    {/* Hero visual — deco circles + floating cards. No real
-                        product photography in the seed, so the shoe area is a
-                        styled placeholder rather than an <img>. */}
                     <div className="relative min-h-[360px] flex-1 overflow-hidden bg-slate lg:min-h-0">
                         <div className="absolute -top-20 left-[350px] h-[500px] w-[500px] rounded-full bg-gold/5" />
                         <div className="absolute top-[380px] -left-20 h-[200px] w-[200px] rounded-full bg-gold/5" />
@@ -107,7 +100,6 @@ export default function Welcome() {
                     </div>
                 </section>
 
-                {/* Shop by Category — Figma node 29:20 */}
                 <section className="mx-auto w-full max-w-shell px-6 py-12 lg:px-16">
                     <h2 className="mb-6 text-2xl font-semibold">
                         Shop by Category
@@ -132,7 +124,6 @@ export default function Welcome() {
                     </div>
                 </section>
 
-                {/* Trending — Figma node 29:35 */}
                 <section
                     id="trending"
                     className="mx-auto w-full max-w-shell px-6 pt-12 pb-16 lg:px-16"

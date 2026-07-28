@@ -8,11 +8,6 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   GET  /api/admin/reviews                 cross-product, filterable
- *   POST /api/admin/reviews/{review}/hide
- *   POST /api/admin/reviews/{review}/unhide
- */
 class ReviewController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection

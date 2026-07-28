@@ -8,13 +8,6 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\JsonResponse;
 
-/**
- * Adding/removing extra gallery images for a shoe (beyond the single
- * primary image the "Add New Shoe" flow can attach directly).
- *
- *   POST   /api/products/{product}/images
- *   DELETE /api/product-images/{productImage}
- */
 class ProductImageController extends Controller
 {
     public function store(StoreProductImageRequest $request, Product $product): JsonResponse

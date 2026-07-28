@@ -8,17 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
-/**
- * A customer order (checkout). Feature 3 creates it and attaches payments;
- * Feature 4 walks its status forward and logs tracking + notifications.
- *
- * @property int $id
- * @property int $user_id
- * @property string $order_number
- * @property string $status
- * @property float $subtotal
- * @property float $total
- */
 class Order extends Model
 {
     use HasFactory;
@@ -38,7 +27,6 @@ class Order extends Model
         ];
     }
 
-    // -------- relationships --------
 
     public function user(): BelongsTo
     {
@@ -55,24 +43,20 @@ class Order extends Model
         return $this->hasMany(Payment::class);
     }
 
-    // -------- helpers --------
 
-    /** Recalculate subtotal/total from the current line items. */
     public function recalcTotals(): void
     {
         $subtotal = (float) $this->items()->sum('line_total');
         $this->subtotal = $subtotal;
-        $this->total = $subtotal; // no shipping/tax in this project
+        $this->total = $subtotal;
         $this->save();
     }
 
-    /** Whether the order has a successful payment. */
     public function isPaid(): bool
     {
         return $this->payments()->where('status', 'succeeded')->exists();
     }
 
-    /** Generate a human order number like CH-2026-0007 from the id. */
     public static function makeOrderNumber(int $id): string
     {
         return 'CH-'.date('Y').'-'.str_pad((string) $id, 4, '0', STR_PAD_LEFT);
@@ -88,18 +72,12 @@ class Order extends Model
         return $this->hasMany(Notification::class);
     }
 
-    /** Which notification type each fulfilment stage triggers. */
     private const STAGE_NOTIFICATION = [
         'paid' => 'order_confirmed',
         'shipped' => 'order_shipped',
         'delivered' => 'order_delivered',
     ];
 
-    /**
-     * Fulfilment timeline: each tracking row with its stage's notification
-     * attached as ->matched_notification. Used by the tracking API and the
-     * public /track page.
-     */
     public function trackingTimeline(): Collection
     {
         $this->loadMissing(['tracking', 'notifications']);

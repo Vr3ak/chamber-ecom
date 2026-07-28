@@ -143,7 +143,6 @@ export default function Track({ query, notFound, order, timeline }: Props) {
 
                     {order && (
                         <div className="mt-8 space-y-6">
-                            {/* Summary */}
                             <section className="rounded-lg border border-line p-5">
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div>
@@ -223,7 +222,6 @@ export default function Track({ query, notFound, order, timeline }: Props) {
                                 )}
                             </section>
 
-                            {/* Timeline */}
                             <section className="rounded-lg border border-line p-5">
                                 <h2 className="mb-4 font-semibold">
                                     Fulfilment timeline

@@ -10,12 +10,6 @@ use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   GET    /api/categories             root categories + their children (+ products_count)
- *   POST   /api/categories             create              (admin)
- *   PUT    /api/categories/{category}  update              (admin)
- *   DELETE /api/categories/{category}  delete              (admin)
- */
 class CategoryController extends Controller
 {
     public function index(): AnonymousResourceCollection

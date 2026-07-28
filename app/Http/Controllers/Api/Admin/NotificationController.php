@@ -10,11 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   GET  /api/admin/notifications           all notifications, optional ?status=
- *   GET  /api/admin/notifications/failed    failed only (legacy, kept working)
- *   POST /api/admin/notifications/{notification}/resend
- */
 class NotificationController extends Controller
 {
     public function __construct(private readonly NotificationService $notifications) {}

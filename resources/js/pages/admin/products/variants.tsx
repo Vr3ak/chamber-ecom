@@ -35,7 +35,6 @@ type Props = {
 const field =
     'h-10 w-full rounded-[6px] border border-line bg-transparent px-3 text-sm focus:border-ink focus:outline-none';
 
-/** Product variants — Figma node 48:4044. */
 export default function ProductVariants({ product, variants, options }: Props) {
     const [deleting, setDeleting] = useState<Variant | null>(null);
 

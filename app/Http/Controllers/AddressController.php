@@ -11,16 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
-/**
- * The logged-in customer's saved address book. Session-guarded, same
- * ownership rules as CartController/WishlistController.
- *
- *   GET    /addresses
- *   POST   /addresses
- *   PUT    /addresses/{address}
- *   DELETE /addresses/{address}
- *   POST   /addresses/{address}/default
- */
 class AddressController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection

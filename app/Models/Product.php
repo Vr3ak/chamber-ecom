@@ -11,18 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
-/**
- * A shoe model (Air Max 90, UltraBoost...). This is the central entity
- * of Feature 1 — the Detailed Product Page.
- *
- * @property int $id
- * @property int $brand_id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property float $base_price
- * @property bool $is_active
- */
 class Product extends Model
 {
     use HasFactory;
@@ -39,9 +27,6 @@ class Product extends Model
         ];
     }
 
-    /**
-     * Auto-generate a URL slug from the name when one isn't supplied.
-     */
     protected static function booted(): void
     {
         static::saving(function (Product $product): void {
@@ -51,7 +36,6 @@ class Product extends Model
         });
     }
 
-    // -------- relationships --------
 
     public function brand(): BelongsTo
     {
@@ -78,38 +62,28 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'product_categories');
     }
 
-    /** The trending entry for this product, if an admin has featured it. */
     public function trending(): HasOne
     {
         return $this->hasOne(Trending::class);
     }
 
-    // -------- scopes & helpers --------
 
-    /** Only products that should appear in the catalogue. */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    /** Use the slug in route-model binding (/api/products/air-max-90). */
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    /**
-     * Total stock across every variant — the SUM(stock_quantity) from the
-     * Advanced SQL doc (1.2). Available as $product->total_stock once
-     * withSum('variants', 'stock_quantity') has been eager-loaded.
-     */
     public function getTotalStockAttribute(): int
     {
         return (int) ($this->variants_sum_stock_quantity
             ?? $this->variants()->sum('stock_quantity'));
     }
 
-    /** "out_of_stock" / "low_stock" / "in_stock" for the admin shoe list. */
     public function getStockStatusAttribute(): string
     {
         return match (true) {
@@ -119,7 +93,6 @@ class Product extends Model
         };
     }
 
-    /** Whether an admin has this product in the active trending set. */
     public function getIsTrendingAttribute(): bool
     {
         if ($this->relationLoaded('trending')) {
@@ -129,13 +102,6 @@ class Product extends Model
         return $this->trending()->where('is_active', true)->exists();
     }
 
-    /**
-     * The variant to use when a caller wants to buy "the product" without
-     * picking a colour/size first (e.g. an "Add to cart" button on a
-     * wishlist card, which only knows the product, not a variant). Prefers
-     * an in-stock variant; falls back to any variant so an out-of-stock
-     * product can still surface a clear "no stock" message downstream.
-     */
     public function defaultVariant(): ?ProductVariant
     {
         return $this->variants()->where('stock_quantity', '>', 0)->orderBy('id')->first()

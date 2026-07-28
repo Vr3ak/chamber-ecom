@@ -6,19 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * A single line in an order — the exact variant bought, with the name,
- * label and price snapshotted at purchase time.
- *
- * @property int    $id
- * @property int    $order_id
- * @property int    $product_variant_id
- * @property string $product_name
- * @property string $variant_label
- * @property float  $unit_price
- * @property int    $quantity
- * @property float  $line_total
- */
 class OrderItem extends Model
 {
     use HasFactory;

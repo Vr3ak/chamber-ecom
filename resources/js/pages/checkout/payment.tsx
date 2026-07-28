@@ -39,7 +39,6 @@ export default function Payment({ order, payment, qrImage, merchant }: Props) {
                     </h1>
 
                     <div className="mt-6 grid gap-8 lg:grid-cols-2">
-                        {/* ---- QR card — Figma node 48:2173 ---- */}
                         <section className="flex flex-col gap-6 rounded-lg border border-line px-6 py-10">
                             <h2 className="text-lg font-semibold">
                                 Scan to Pay with KHQR
@@ -83,7 +82,6 @@ export default function Payment({ order, payment, qrImage, merchant }: Props) {
                             )}
                         </section>
 
-                        {/* ---- summary + status — Figma node 48:2188 ---- */}
                         <div className="flex flex-col gap-5">
                             <section className="flex flex-col gap-4 rounded-lg border border-line p-6">
                                 <h2 className="text-[15px] font-semibold">

@@ -46,7 +46,6 @@ const FILTERS = [
     ['cancelled', 'Cancelled'],
 ] as const;
 
-/** Admin orders table — Figma node 32:705. */
 export default function AdminOrders({
     query,
     status,

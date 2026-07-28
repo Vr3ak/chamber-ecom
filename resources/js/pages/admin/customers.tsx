@@ -34,7 +34,6 @@ type Props = {
     };
 };
 
-/** Admin customers — Figma node 48:2592. */
 export default function AdminCustomers({
     query,
     customers,

@@ -39,7 +39,6 @@ type Props = {
     }[];
 };
 
-// Donut colours, ordered to match the legend below it.
 const STATUS_COLORS: Record<string, string> = {
     delivered: '#46a344',
     shipped: '#1c4e8a',
@@ -52,7 +51,6 @@ export default function AdminDashboard(props: Props) {
     const entries = Object.entries(status) as [keyof typeof status, number][];
     const totalStatus = entries.reduce((sum, [, n]) => sum + n, 0);
 
-    // Conic-gradient donut — avoids pulling in a chart library for one ring.
     let cursor = 0;
     const slices = entries.map(([key, count]) => {
         const start = totalStatus ? (cursor / totalStatus) * 360 : 0;

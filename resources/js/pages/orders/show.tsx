@@ -85,7 +85,6 @@ export default function OrderDetail({ order, timeline, reviewable }: Props) {
 
                 <div className="mt-6 flex flex-col gap-8 lg:flex-row">
                     <div className="flex flex-1 flex-col gap-5">
-                        {/* Items */}
                         <section className="overflow-hidden rounded-lg border border-line">
                             <h2 className="border-b border-line px-5 py-4 text-base font-semibold">
                                 Items
@@ -131,7 +130,6 @@ export default function OrderDetail({ order, timeline, reviewable }: Props) {
                             ))}
                         </section>
 
-                        {/* Fulfilment timeline */}
                         <section className="rounded-lg border border-line p-6">
                             <h2 className="mb-4 text-base font-semibold">
                                 Fulfilment timeline
@@ -175,7 +173,6 @@ export default function OrderDetail({ order, timeline, reviewable }: Props) {
                         </section>
                     </div>
 
-                    {/* Summary + shipping */}
                     <aside className="flex w-full shrink-0 flex-col gap-5 self-start lg:w-[380px]">
                         <section className="flex flex-col gap-3 rounded-lg border border-line p-6">
                             <h2 className="text-base font-semibold">Summary</h2>
@@ -225,10 +222,6 @@ export default function OrderDetail({ order, timeline, reviewable }: Props) {
                 </div>
             </main>
 
-            {/* Keyed by product so the form remounts per shoe: useForm only
-                reads its initial data once, and this modal is mounted with
-                the page while `reviewing` is still null. Without the key the
-                submitted product_id stays 0 and the review silently fails. */}
             <WriteReviewModal
                 key={reviewing?.product_id ?? 'none'}
                 orderId={order.id}

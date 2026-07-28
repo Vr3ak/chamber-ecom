@@ -13,6 +13,7 @@ type Order = {
 };
 
 type Props = {
+    status: string | null;
     orders: Order[];
     pagination: {
         current: number;
@@ -23,10 +24,17 @@ type Props = {
     };
 };
 
+const TABS = [
+    ['', 'All Orders'],
+    ['processing', 'Processing'],
+    ['shipped', 'Shipped'],
+    ['delivered', 'Delivered'],
+    ['cancelled', 'Cancelled'],
+] as const;
+
 const money = (n: number) =>
     n.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
 
-// Figma pills the status; these mirror Order's status column.
 const STATUS_TONE: Record<string, string> = {
     pending: 'bg-line text-slate',
     paid: 'bg-[#c3ddc5] text-[#1f5b1e]',
@@ -35,7 +43,14 @@ const STATUS_TONE: Record<string, string> = {
     cancelled: 'bg-[#f7d6d6] text-[#8a1c1c]',
 };
 
-export default function OrderHistory({ orders, pagination }: Props) {
+export default function OrderHistory({ status, orders, pagination }: Props) {
+    const tabHref = (value: string) =>
+        value ? `/orders?status=${value}` : '/orders';
+    const pageHref = (page: number) =>
+        status
+            ? `/orders?status=${status}&page=${page}`
+            : `/orders?page=${page}`;
+
     return (
         <div className="flex min-h-screen flex-col bg-mist font-display text-ink">
             <Head title="My Orders — Chamber" />
@@ -50,10 +65,36 @@ export default function OrderHistory({ orders, pagination }: Props) {
                     </p>
                 </div>
 
+                <nav
+                    className="mt-6 flex flex-wrap gap-6 border-b border-line"
+                    aria-label="Filter orders by status"
+                >
+                    {TABS.map(([value, label]) => {
+                        const on = (status ?? '') === value;
+
+                        return (
+                            <Link
+                                key={value || 'all'}
+                                href={tabHref(value)}
+                                aria-current={on ? 'page' : undefined}
+                                className={`-mb-px border-b-2 pb-3 text-sm transition-colors ${
+                                    on
+                                        ? 'border-gold font-medium text-ink'
+                                        : 'border-transparent text-slate hover:text-ink'
+                                }`}
+                            >
+                                {label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+
                 {orders.length === 0 ? (
                     <div className="mt-6 rounded-lg border border-line p-12 text-center">
                         <p className="text-slate">
-                            You haven't placed any orders yet.
+                            {status
+                                ? 'No orders in this status.'
+                                : "You haven't placed any orders yet."}
                         </p>
                         <Link
                             href="/men"
@@ -115,7 +156,7 @@ export default function OrderHistory({ orders, pagination }: Props) {
                         <div className="flex items-center gap-4">
                             {pagination.current > 1 && (
                                 <Link
-                                    href={`/orders?page=${pagination.current - 1}`}
+                                    href={pageHref(pagination.current - 1)}
                                     className="text-slate hover:text-gold"
                                 >
                                     ‹ Prev
@@ -123,7 +164,7 @@ export default function OrderHistory({ orders, pagination }: Props) {
                             )}
                             {pagination.current < pagination.last && (
                                 <Link
-                                    href={`/orders?page=${pagination.current + 1}`}
+                                    href={pageHref(pagination.current + 1)}
                                     className="text-slate hover:text-gold"
                                 >
                                     Next ›

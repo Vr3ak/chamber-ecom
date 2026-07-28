@@ -36,7 +36,6 @@ const slugify = (s: string) =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
 
-/** Create / Edit Shoe — Figma node 32:706. */
 export default function ProductForm({ product, options }: Props) {
     const editing = product !== null;
 
@@ -64,13 +63,10 @@ export default function ProductForm({ product, options }: Props) {
         );
     }
 
-    // Slug follows the name until the product exists; after that it's a real
-    // URL that other things may link to, so it's left alone.
     useEffect(() => {
         if (!editing) {
             setData('slug', slugify(data.name));
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data.name, editing]);
 
     function submit(e: React.FormEvent) {

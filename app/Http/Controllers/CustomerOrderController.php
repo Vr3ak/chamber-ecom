@@ -11,23 +11,29 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/**
- * The signed-in customer's own orders (Figma 04 — Account & Order History).
- *
- * Every query is scoped to auth()->id(); the order is never trusted from the
- * route alone. Distinct from Api\Admin\OrderController, which sees all orders.
- */
 class CustomerOrderController extends Controller
 {
+    private const STATUS_TABS = [
+        'processing' => ['pending', 'paid', 'packed'],
+        'shipped' => ['shipped'],
+        'delivered' => ['delivered'],
+        'cancelled' => ['cancelled'],
+    ];
+
     public function index(Request $request): Response
     {
+        $tab = (string) $request->query('status', '');
+        $statuses = self::STATUS_TABS[$tab] ?? null;
+
         $orders = $request->user()->orders()
             ->with(['items', 'payments'])
+            ->when($statuses, fn ($q) => $q->whereIn('status', $statuses))
             ->latest('placed_at')
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('orders/index', [
+            'status' => $statuses ? $tab : null,
             'orders' => OrderResource::collection($orders->items())->resolve(),
             'pagination' => [
                 'current' => $orders->currentPage(),
@@ -45,9 +51,6 @@ class CustomerOrderController extends Controller
 
         $order->load(['items.variant.product', 'payments', 'tracking']);
 
-        // Which line items this customer may still review. An order can be
-        // reviewed at any stage; the only limit is one review per product
-        // per customer.
         $reviewed = Review::query()
             ->where('user_id', $request->user()->id)
             ->pluck('product_id')
@@ -68,7 +71,6 @@ class CustomerOrderController extends Controller
         ]);
     }
 
-    /** Write-a-Review modal (Figma node 48:3645). */
     public function review(Request $request, Order $order): RedirectResponse
     {
         abort_if($order->user_id !== $request->user()->id, 404);
@@ -79,16 +81,12 @@ class CustomerOrderController extends Controller
             'body' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        // The product must actually be on this order — otherwise a customer
-        // could review anything in the catalogue off the back of one purchase.
         abort_unless(
             $order->items()->whereHas('variant', fn ($q) => $q->where('product_id', $data['product_id']))->exists(),
             403,
             'That product is not on this order.'
         );
 
-        // Written against one of the customer's own orders, so it still counts
-        // as a verified purchase whatever stage that order is at.
         Review::updateOrCreate(
             ['user_id' => $request->user()->id, 'product_id' => $data['product_id']],
             [

@@ -9,13 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- *   GET  /api/admin/customers                 list (+ stats), filter/search
- *   GET  /api/admin/customers/{user}           profile + recent orders
- *   POST /api/admin/customers/{user}/suspend
- *   POST /api/admin/customers/{user}/activate
- *   GET  /api/admin/customers/export           CSV
- */
 class CustomerController extends Controller
 {
     public function index(Request $request): JsonResponse
@@ -83,7 +76,6 @@ class CustomerController extends Controller
         }, 'customers.csv', ['Content-Type' => 'text/csv']);
     }
 
-    /** @return array<string, int> */
     private function stats(): array
     {
         $base = User::query()->where('is_admin', false);

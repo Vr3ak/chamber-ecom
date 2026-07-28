@@ -13,10 +13,8 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/** Admin order management (Figma 07 — Admin · Orders). */
 class OrderAdminController extends Controller
 {
-    /** Mirrors the orders.status enum; 'pending' is the initial state only. */
     private const STAGES = ['paid', 'packed', 'shipped', 'delivered', 'cancelled'];
 
     public function index(Request $request): Response
@@ -71,7 +69,6 @@ class OrderAdminController extends Controller
         ]);
     }
 
-    /** Move the order to its next fulfilment stage. */
     public function advance(
         Request $request,
         Order $order,

@@ -10,12 +10,6 @@ use App\Models\Color;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   GET    /api/colors           list
- *   POST   /api/colors           create           (admin)
- *   PUT    /api/colors/{color}   update           (admin)
- *   DELETE /api/colors/{color}   delete           (admin)
- */
 class ColorController extends Controller
 {
     public function index(): AnonymousResourceCollection

@@ -54,7 +54,6 @@ export default function Checkout({ cart, addresses, user }: Props) {
                     {({ processing, errors }) => (
                         <>
                             <div className="flex flex-1 flex-col gap-6">
-                                {/* Shipping — Figma node 32:375 */}
                                 <section className="flex flex-col gap-4 rounded-lg border border-line p-6">
                                     <h2 className="text-lg font-semibold">
                                         Shipping Address
@@ -117,8 +116,6 @@ export default function Checkout({ cart, addresses, user }: Props) {
                                         </div>
                                     )}
 
-                                    {/* Bound to the selection so the posted
-                                        values always match what's shown. */}
                                     <div className="flex flex-col gap-1.5">
                                         <label
                                             className={labelCls}
@@ -294,7 +291,6 @@ export default function Checkout({ cart, addresses, user }: Props) {
                                 </section>
                             </div>
 
-                            {/* Summary — Figma node 32:436 */}
                             <aside className="flex w-full shrink-0 flex-col gap-4 self-start rounded-lg border border-line p-6 lg:w-[448px]">
                                 <h2 className="text-lg font-semibold">
                                     Order Summary

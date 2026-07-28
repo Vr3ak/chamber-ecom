@@ -10,12 +10,6 @@ use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   GET    /api/brands        list (+ products_count, is_active)
- *   POST   /api/brands        create               (admin)
- *   PUT    /api/brands/{brand} update              (admin)
- *   DELETE /api/brands/{brand} delete               (admin)
- */
 class BrandController extends Controller
 {
     public function index(): AnonymousResourceCollection

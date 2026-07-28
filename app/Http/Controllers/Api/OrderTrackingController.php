@@ -13,11 +13,6 @@ use App\Services\OrderTrackingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   POST /api/admin/orders/{order}/advance   (admin) move to next stage
- *   GET  /api/orders/{order}/tracking        (public) the timeline
- *   GET  /api/admin/notifications/failed     (admin) messages to retry
- */
 class OrderTrackingController extends Controller
 {
     public function __construct(private readonly OrderTrackingService $service) {}

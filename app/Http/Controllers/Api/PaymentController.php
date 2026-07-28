@@ -13,10 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-/**
- *   POST /api/orders/{order}/pay          create a real KHQR + pending payment
- *   POST /api/payments/{payment}/confirm  simulate the Bakong "paid" callback
- */
 class PaymentController extends Controller
 {
     public function __construct(
@@ -61,9 +57,6 @@ class PaymentController extends Controller
             $payment->update(['status' => 'failed']);
         } else {
             $payment->update(['status' => 'succeeded', 'paid_at' => now()]);
-            // Via the service, not a bare status write: moving to 'paid' has to
-            // log the tracking row and fire order_confirmed, or the timeline
-            // never shows the payment.
             $this->tracking->advance($payment->order, 'paid', 'Payment received.');
         }
 

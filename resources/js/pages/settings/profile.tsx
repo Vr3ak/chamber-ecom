@@ -29,8 +29,6 @@ export default function Profile({
 
             <h1 className="sr-only">Profile settings</h1>
 
-            {/* Figma frames each account section as a bordered card
-                (node 48:2087) with a 16px semibold title. */}
             <div className="space-y-4 rounded-lg border border-line p-6">
                 <h2 className="text-base font-semibold">
                     Personal Information
@@ -109,7 +107,6 @@ export default function Profile({
                                     </div>
                                 )}
 
-                            {/* Figma right-aligns the action row (node 48:2102). */}
                             <div className="flex items-center justify-end gap-3">
                                 <Button
                                     variant="gold"

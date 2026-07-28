@@ -9,15 +9,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-/**
- * A category node in a self-referencing tree (Footwear > Sneakers > Running).
- * Feeds the breadcrumb on the detailed product page.
- *
- * @property int         $id
- * @property int|null    $parent_id
- * @property string      $name
- * @property string      $slug
- */
 class Category extends Model
 {
     use HasFactory;
@@ -53,7 +44,6 @@ class Category extends Model
         return 'slug';
     }
 
-    /** Ancestors from root to this node — the breadcrumb trail. */
     public function breadcrumb(): array
     {
         $trail = [];

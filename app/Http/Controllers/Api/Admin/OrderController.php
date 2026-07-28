@@ -9,11 +9,6 @@ use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-/**
- *   GET   /api/admin/orders                       all orders (+ stats), filter/search
- *   GET   /api/admin/orders/{order}                full detail incl. customer
- *   PATCH /api/admin/orders/{order}/tracking-number
- */
 class OrderController extends Controller
 {
     public function index(Request $request): JsonResponse
@@ -60,7 +55,6 @@ class OrderController extends Controller
         return OrderResource::make($order->fresh());
     }
 
-    /** @return array<string, int> */
     private function stats(): array
     {
         return [

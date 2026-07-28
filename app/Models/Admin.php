@@ -8,12 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-/**
- * Admin — catalogue manager. Authenticates via Sanctum API tokens.
- */
 class Admin extends Authenticatable
 {
-    /** @use HasFactory<AdminFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [

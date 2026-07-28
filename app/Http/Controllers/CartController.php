@@ -16,17 +16,6 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/**
- * The logged-in customer's shopping cart. Session-guarded (never accepts a
- * user_id from the request) — every action works against auth()->user()'s
- * own active cart only.
- *
- *   GET    /cart
- *   POST   /cart/items
- *   PATCH  /cart/items/{cartItem}
- *   DELETE /cart/items/{cartItem}
- *   DELETE /cart
- */
 class CartController extends Controller
 {
     public function show(Request $request): JsonResponse|Response
@@ -39,9 +28,6 @@ class CartController extends Controller
             ]);
         }
 
-        // Force 200: JsonResource defaults to 201 when the underlying model
-        // was just lazily created by activeFor(), which is an implementation
-        // detail — a GET should never report "created" to the caller.
         return CartResource::make($cart)->response()->setStatusCode(200);
     }
 
@@ -95,10 +81,6 @@ class CartController extends Controller
         return $this->respond($request, $cart);
     }
 
-    /**
-     * API callers get the cart resource back; the Inertia page just needs the
-     * redirect so its `cart` prop is re-resolved from show().
-     */
     private function respond(Request $request, Cart $cart): CartResource|RedirectResponse
     {
         if (! $this->wantsJson($request)) {

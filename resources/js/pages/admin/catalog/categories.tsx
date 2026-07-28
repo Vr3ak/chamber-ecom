@@ -19,7 +19,6 @@ type Props = {
     parents: { id: number; name: string }[];
 };
 
-/** Admin categories — Figma node 48:2343. */
 export default function AdminCategories({ categories, parents }: Props) {
     const [deleting, setDeleting] = useState<Category | null>(null);
     const { errors: pageErrors } = usePage().props as {

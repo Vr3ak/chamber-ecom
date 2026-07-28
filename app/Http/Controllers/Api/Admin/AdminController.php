@@ -10,12 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
 
-/**
- * Superadmin-only management of other admin accounts.
- *
- *   GET  /api/admin/admins  list
- *   POST /api/admin/admins  create
- */
 class AdminController extends Controller
 {
     public function index(): AnonymousResourceCollection

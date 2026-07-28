@@ -12,7 +12,7 @@ class Notification extends Model
 
     protected $table = 'notifications';
 
-    public $timestamps = false; // table has only sent_at
+    public $timestamps = false;
 
     protected $fillable = ['order_id', 'user_id', 'channel', 'type', 'recipient', 'status', 'sent_at'];
 

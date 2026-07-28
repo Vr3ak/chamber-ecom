@@ -10,14 +10,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
-/**
- * The KHQR payment screen (Figma 48:2149 "Complete Your Payment").
- *
- * Session-authenticated and scoped to the order's owner — unlike the /api
- * payment endpoints, nothing here takes a user id from the request. The QR is
- * a real EMVCo/Bakong payload; the "I've paid" confirmation is simulated,
- * exactly as the API flow does it.
- */
 class CheckoutPaymentController extends Controller
 {
     public function __construct(
@@ -34,9 +26,6 @@ class CheckoutPaymentController extends Controller
             return to_route('track', ['order' => $order->order_number]);
         }
 
-        // ponytail: bill ref derived from the order id, so a page refresh
-        // rebuilds the identical payload rather than orphaning the last QR.
-        // Needs a stored ref per attempt if retries ever have to be told apart.
         $payload = $this->khqr->payload((float) $order->total, 'CH'.$order->id);
 
         $payment = $order->payments()
@@ -67,7 +56,6 @@ class CheckoutPaymentController extends Controller
         ]);
     }
 
-    /** Simulates the Bakong callback: mark the payment, advance the order. */
     public function confirm(Request $request, Payment $payment): RedirectResponse
     {
         abort_unless($payment->order->user_id === $request->user()->id, 404);
@@ -82,8 +70,6 @@ class CheckoutPaymentController extends Controller
         $payment->update(['status' => 'succeeded', 'paid_at' => now()]);
         $this->tracking->advance($payment->order, 'paid', 'Payment received.');
 
-        // Figma puts an Order Confirmation screen (node 48:3502) after a
-        // successful payment; it links on to tracking from there.
         return to_route('checkout.confirmation', $payment->order);
     }
 }

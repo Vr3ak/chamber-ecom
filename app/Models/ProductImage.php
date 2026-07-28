@@ -9,19 +9,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- * A gallery image for a product. May be tied to a colour so the gallery
- * can swap when the shopper changes the colour variant. `is_primary`
- * marks the main thumbnail.
- *
- * @property int $id
- * @property int $product_id
- * @property int|null $color_id
- * @property string $url
- * @property string|null $alt
- * @property int $sort_order
- * @property bool $is_primary
- */
 class ProductImage extends Model
 {
     use HasFactory;
@@ -46,11 +33,6 @@ class ProductImage extends Model
         return $this->belongsTo(Color::class);
     }
 
-    /**
-     * Store an uploaded file on the public disk and create its row.
-     *
-     * @param  array<string, mixed>  $attributes  color_id / alt / sort_order / is_primary
-     */
     public static function storeUpload(UploadedFile $file, int $productId, array $attributes = []): self
     {
         $path = $file->storeAs(

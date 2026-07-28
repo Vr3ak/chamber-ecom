@@ -181,6 +181,56 @@ test('another customer cannot review against an order that is not theirs', funct
     expect(Review::count())->toBe(0);
 });
 
+test('the order history tabs filter by status', function () {
+    $user = User::factory()->create();
+
+    $orders = collect(['pending', 'paid', 'packed', 'shipped', 'delivered', 'cancelled'])
+        ->mapWithKeys(fn (string $status) => [
+            $status => Order::factory()->create(['user_id' => $user->id, 'status' => $status]),
+        ]);
+
+    $listed = function (string $query) use ($user) {
+        $page = $this->actingAs($user)->get("/orders{$query}")->assertOk()->viewData('page');
+
+        return [
+            'status' => $page['props']['status'],
+            'ids' => array_column($page['props']['orders'], 'id'),
+        ];
+    };
+
+    expect($listed('')['ids'])->toHaveCount(6)
+        ->and($listed('')['status'])->toBeNull();
+
+    // "Processing" collapses the three pre-dispatch stages.
+    expect($listed('?status=processing')['ids'])
+        ->toEqualCanonicalizing($orders->only(['pending', 'paid', 'packed'])->pluck('id')->all());
+
+    expect($listed('?status=shipped')['ids'])->toBe([$orders['shipped']->id])
+        ->and($listed('?status=delivered')['ids'])->toBe([$orders['delivered']->id])
+        ->and($listed('?status=cancelled')['ids'])->toBe([$orders['cancelled']->id]);
+});
+
+test('an unknown status tab falls back to showing everything', function () {
+    $user = User::factory()->create();
+    Order::factory()->create(['user_id' => $user->id, 'status' => 'paid']);
+
+    $page = $this->actingAs($user)->get('/orders?status=nonsense')->assertOk()->viewData('page');
+
+    // No tab should render as selected for a value we don't recognise.
+    expect($page['props']['status'])->toBeNull()
+        ->and($page['props']['orders'])->toHaveCount(1);
+});
+
+test('the order history only ever lists the signed-in customer\'s orders', function () {
+    $user = User::factory()->create();
+    Order::factory()->create(['user_id' => $user->id, 'status' => 'delivered']);
+    Order::factory()->create(['status' => 'delivered']); // someone else's
+
+    $page = $this->actingAs($user)->get('/orders?status=delivered')->assertOk()->viewData('page');
+
+    expect($page['props']['orders'])->toHaveCount(1);
+});
+
 /**
  * `reviewable` is what decides whether the order page renders a "Write a
  * review" button at all, so the Order History → review path hinges on it.

@@ -14,12 +14,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-/**
- *   GET  /api/orders?user_id=1        a customer's orders
- *   POST /api/orders                  place an order (reduces stock)
- *   GET  /api/orders/{order}          one order with its items + payments
- *   GET  /api/orders/{order}/payments full payment history (Mission 5 step 4f)
- */
 class OrderController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
@@ -49,7 +43,6 @@ class OrderController extends Controller
             ]);
 
             foreach ($data['items'] as $line) {
-                /** @var ProductVariant $variant */
                 $variant = ProductVariant::with(['product', 'color', 'size'])
                     ->lockForUpdate()
                     ->findOrFail($line['product_variant_id']);
@@ -92,7 +85,6 @@ class OrderController extends Controller
         return OrderResource::make($order->load(['items', 'payments']));
     }
 
-    /** Full payment history for an order (Mission 5 step 4f). */
     public function payments(Order $order): AnonymousResourceCollection
     {
         return PaymentResource::collection($order->payments()->orderBy('id')->get());

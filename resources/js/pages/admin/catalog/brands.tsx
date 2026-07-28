@@ -13,7 +13,6 @@ type Brand = {
     products_count: number;
 };
 
-/** Admin brands — Figma node 48:2212. */
 export default function AdminBrands({ brands }: { brands: Brand[] }) {
     const [deleting, setDeleting] = useState<Brand | null>(null);
     const { errors: pageErrors } = usePage().props as {

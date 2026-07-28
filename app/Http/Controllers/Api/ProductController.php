@@ -17,29 +17,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Shoe (product) CRUD + the Feature 2 Filter/Search endpoint.
- *
- *   GET    /api/products            list + filter/search (Feature 2)
- *   GET    /api/filters             the available filter options (facets)
- *   POST   /api/products            create a shoe (+ optional variants)
- *   GET    /api/products/{product}  detailed product page (Feature 1)
- *   PUT    /api/products/{product}  update a shoe
- *   DELETE /api/products/{product}  delete a shoe
- */
 class ProductController extends Controller
 {
-    /**
-     * Feature 2 — Filter / Search.
-     * Every filter is optional and they combine (AND) together:
-     *   ?q=air                     keyword on the product name
-     *   ?brand_id=1  or ?brand_id=1,2   one or many brands
-     *   ?color_id=1,3              one or many colours
-     *   ?size_id=3                 one or many sizes
-     *   ?min_price=80&max_price=150 price range (uses the base price)
-     *   ?sort=price_asc|price_desc|top_rated|newest
-     *   ?per_page=12&page=2        pagination
-     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $brandIds = $this->ids($request->input('brand_id'));
@@ -52,17 +31,12 @@ class ProductController extends Controller
             ->withCount(['reviews' => fn ($q) => $q->visible(), 'variants'])
             ->withSum('variants', 'stock_quantity')
             ->withAvg(['reviews' => fn ($q) => $q->visible()], 'rating')
-            // keyword search on the name
             ->when($request->filled('q'), fn ($qb) => $qb->where('name', 'like', '%'.$request->string('q').'%'))
-            // brand filter (one or many)
             ->when($brandIds, fn ($qb) => $qb->whereIn('brand_id', $brandIds))
-            // price range on base_price
             ->when($request->filled('min_price'), fn ($qb) => $qb->where('base_price', '>=', $request->float('min_price')))
             ->when($request->filled('max_price'), fn ($qb) => $qb->where('base_price', '<=', $request->float('max_price')))
-            // colour / size live on the variants
             ->when($colorIds, fn ($qb) => $qb->whereHas('variants', fn ($v) => $v->whereIn('color_id', $colorIds)))
             ->when($sizeIds, fn ($qb) => $qb->whereHas('variants', fn ($v) => $v->whereIn('size_id', $sizeIds)))
-            // sorting
             ->when($request->input('sort') === 'price_asc', fn ($qb) => $qb->orderBy('base_price'))
             ->when($request->input('sort') === 'price_desc', fn ($qb) => $qb->orderByDesc('base_price'))
             ->when($request->input('sort') === 'top_rated', fn ($qb) => $qb->orderByDesc('reviews_avg_rating'))
@@ -73,11 +47,6 @@ class ProductController extends Controller
         return ProductListResource::collection($products);
     }
 
-    /**
-     * Feature 2 — the filter panel options (facets) the sidebar renders:
-     * brands (with how many active products each has), colours, sizes,
-     * and the min/max price across the catalogue.
-     */
     public function filters(): JsonResponse
     {
         return response()->json([
@@ -132,9 +101,6 @@ class ProductController extends Controller
             ->setStatusCode(201);
     }
 
-    /**
-     * The Detailed Product Page payload (Feature 1) + related shoes.
-     */
     public function show(Product $product): JsonResponse
     {
         $product = $this->loadDetail($product);
@@ -179,12 +145,6 @@ class ProductController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
-     * Turn a filter value into a clean array of ids. Accepts a single id,
-     * a comma list ("1,3"), or an array (brand_id[]=1&brand_id[]=2).
-     *
-     * @return array<int, int>
-     */
     private function ids(mixed $value): array
     {
         if ($value === null || $value === '') {

@@ -7,14 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-/**
- * A shoe manufacturer (Nike, Adidas, Puma...).
- *
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $logo_image
- */
 class Brand extends Model
 {
     use HasFactory;
@@ -37,7 +29,6 @@ class Brand extends Model
         });
     }
 
-    /** Every product made by this brand. */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);

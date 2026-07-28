@@ -12,10 +12,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/** Admin customers, notifications and review moderation (Figma 09). */
 class PeopleAdminController extends Controller
 {
-    // ---------------- Customers ----------------
 
     public function customers(Request $request): Response
     {
@@ -56,7 +54,6 @@ class PeopleAdminController extends Controller
 
     public function suspendCustomer(User $user): RedirectResponse
     {
-        // is_suspended is deliberately not mass-assignable on the model.
         $user->forceFill(['is_suspended' => true])->save();
 
         return back()->with('success', 'Customer suspended.');
@@ -69,7 +66,6 @@ class PeopleAdminController extends Controller
         return back()->with('success', 'Customer reactivated.');
     }
 
-    // ---------------- Notifications ----------------
 
     public function notifications(Request $request): Response
     {
@@ -78,9 +74,6 @@ class PeopleAdminController extends Controller
         $notifications = Notification::query()
             ->with(['order', 'user'])
             ->when($status, fn ($q) => $q->where('status', $status))
-            // The table has no timestamps (only sent_at, which is null until
-            // delivery), so latest() would order by a created_at that does not
-            // exist. Newest-first by id, matching Api\Admin\NotificationController.
             ->orderByDesc('id')
             ->paginate(20)
             ->withQueryString();
@@ -108,11 +101,6 @@ class PeopleAdminController extends Controller
         ]);
     }
 
-    /**
-     * Re-send by issuing a fresh notification of the same type, matching
-     * Api\Admin\NotificationController::resend — the service has no resend();
-     * it only knows how to notify(Order, type).
-     */
     public function resendNotification(
         Notification $notification,
         NotificationService $notifications,
@@ -126,7 +114,6 @@ class PeopleAdminController extends Controller
         return back()->with('success', 'Notification resent.');
     }
 
-    // ---------------- Reviews ----------------
 
     public function reviews(Request $request): Response
     {

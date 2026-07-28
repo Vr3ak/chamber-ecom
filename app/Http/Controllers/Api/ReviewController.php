@@ -10,13 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 
-/**
- * Reviews for a product — feeds the AVG(rating)/COUNT(*) summary and the
- * review list on the detailed product page.
- *
- *   GET  /api/products/{product}/reviews
- *   POST /api/products/{product}/reviews
- */
 class ReviewController extends Controller
 {
     public function index(Product $product): AnonymousResourceCollection
@@ -31,8 +24,6 @@ class ReviewController extends Controller
         $data = $request->validate([
             'rating' => ['required', 'integer', 'between:1,5'],
             'body' => ['nullable', 'string', 'max:2000'],
-            // In a real app the user comes from auth()->id(); accepted here
-            // so the endpoint is usable while customer auth is wired up.
             'user_id' => ['required', 'integer', Rule::exists('users', 'id')],
             'order_id' => ['nullable', 'integer'],
         ]);

@@ -33,7 +33,6 @@ const FILTERS = [
     ['failed', 'Failed'],
 ] as const;
 
-/** Admin notification inbox — Figma node 48:2774. */
 export default function AdminNotifications({
     status,
     notifications,

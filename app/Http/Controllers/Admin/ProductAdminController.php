@@ -18,12 +18,6 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/**
- * Admin catalogue management (Figma 06 — Admin · Products).
- *
- * Session-guarded counterpart to Api\ProductController / Api\ProductVariantController,
- * which are Sanctum-token surfaces and unreachable from the browser session.
- */
 class ProductAdminController extends Controller
 {
     public function index(Request $request): Response
@@ -131,7 +125,6 @@ class ProductAdminController extends Controller
             ->with('success', 'Product deleted.');
     }
 
-    /** Variant table for one product (Figma node 48:4044). */
     public function variants(Product $product): Response
     {
         $product->load(['variants.color', 'variants.size', 'brand']);
@@ -158,9 +151,6 @@ class ProductAdminController extends Controller
     public function storeVariant(Request $request, Product $product): RedirectResponse
     {
         $data = $request->validate([
-            // product_variants has a unique (product_id, color_id, size_id)
-            // constraint — enforce it here so the user gets a field error
-            // rather than a 500 from the database.
             'color_id' => [
                 'required', 'integer', 'exists:colors,id',
                 Rule::unique('product_variants', 'color_id')
@@ -198,7 +188,6 @@ class ProductAdminController extends Controller
         return back()->with('success', 'Variant removed.');
     }
 
-    /** @return array<string, mixed> */
     private function validated(Request $request, ?Product $product = null): array
     {
         return $request->validate([
@@ -216,15 +205,6 @@ class ProductAdminController extends Controller
         ]);
     }
 
-    /**
-     * Feature (or un-feature) a shoe on the storefront's Trending rail.
-     *
-     * The row is kept and flipped rather than deleted so a shoe that gets
-     * re-featured keeps the position it was curated at. New entries go to the
-     * back of the rail. admin_id is best-effort: the panel authenticates a
-     * User, and only some of those have a matching row in the `admins` table
-     * this column references.
-     */
     private function syncTrending(Request $request, Product $product): void
     {
         if (! $request->has('is_trending')) {
@@ -248,7 +228,6 @@ class ProductAdminController extends Controller
         $product->unsetRelation('trending');
     }
 
-    /** @return array<string, mixed> */
     private function options(): array
     {
         return [
@@ -259,7 +238,6 @@ class ProductAdminController extends Controller
         ];
     }
 
-    /** @return array<string, mixed> */
     private function paginationMeta($paginator): array
     {
         return [

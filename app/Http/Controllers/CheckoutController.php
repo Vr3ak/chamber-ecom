@@ -15,17 +15,6 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/**
- * Checkout — turns the signed-in customer's own cart into an order.
- *
- * Deliberately NOT a thin wrapper over Api\OrderController::store: that one
- * takes user_id and an items[] array from the request body, which is fine for
- * a token API but would let a browser session order on someone else's behalf.
- * Here the user comes from the session and the lines come from their cart.
- *
- *   GET  /checkout   the form
- *   POST /checkout   place the order, then hand off to KHQR payment
- */
 class CheckoutController extends Controller
 {
     public function show(Request $request): Response|RedirectResponse
@@ -69,7 +58,6 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Order stores the destination as one string; Address keeps it split.
         $address = collect([
             $data['street_line'],
             $data['city'],
@@ -90,7 +78,6 @@ class CheckoutController extends Controller
             ]);
 
             foreach ($cart->items as $item) {
-                /** @var ProductVariant $variant */
                 $variant = ProductVariant::with(['product', 'color', 'size'])
                     ->lockForUpdate()
                     ->findOrFail($item->product_variant_id);
@@ -119,8 +106,6 @@ class CheckoutController extends Controller
             $order->recalcTotals();
             $order->update(['order_number' => Order::makeOrderNumber($order->id)]);
 
-            // The cart has become the order; empty it so a refresh can't
-            // place the same lines twice.
             $cart->items()->delete();
 
             return $order;
@@ -129,7 +114,6 @@ class CheckoutController extends Controller
         return redirect()->route('checkout.pay', $order);
     }
 
-    /** Post-payment thank-you screen (Figma node 48:3502). */
     public function confirmation(Request $request, Order $order): Response
     {
         abort_if($order->user_id !== $request->user()->id, 404);

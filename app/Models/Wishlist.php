@@ -7,13 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * A customer's saved-for-later list. No timestamps in this table.
- *
- * @property int $id
- * @property int $user_id
- * @property string $name
- */
 class Wishlist extends Model
 {
     use HasFactory;
@@ -32,7 +25,6 @@ class Wishlist extends Model
         return $this->hasMany(WishlistItem::class);
     }
 
-    /** The user's default wishlist, creating one if none exists. */
     public static function defaultFor(User $user): self
     {
         return static::firstOrCreate(

@@ -55,10 +55,6 @@ export default function Category({
     const [minPrice, setMinPrice] = useState(active.min_price ?? '');
     const [maxPrice, setMaxPrice] = useState(active.max_price ?? '');
 
-    // Merge a partial filter change into the current query and navigate.
-    // Values are narrowed to `string | undefined` (rather than `unknown`) so
-    // the object satisfies Inertia's RequestPayload; every filter serialises
-    // to a query string anyway.
     function apply(patch: Record<string, string | undefined>) {
         const params: Record<string, string | undefined> = {
             brand_id: active.brand_id.join(',') || undefined,
@@ -109,7 +105,6 @@ export default function Category({
             <SiteNavbar variant="dark" />
 
             <div className="mx-auto w-full max-w-shell px-6 pt-8 pb-16 lg:px-16">
-                {/* Breadcrumb — Figma node 32:784 */}
                 <nav className="flex gap-1.5 text-[13px] text-slate">
                     <Link href="/" className="hover:text-gold">
                         Home
@@ -126,7 +121,6 @@ export default function Category({
                 </div>
 
                 <div className="mt-5 flex flex-col gap-8 lg:flex-row">
-                    {/* Filters — Figma bounds the sidebar as a 280px card. */}
                     <aside className="flex w-full shrink-0 flex-col gap-6 rounded-lg border border-line p-6 lg:w-[280px]">
                         <h2 className="text-base font-semibold">Filters</h2>
 
@@ -270,9 +264,7 @@ export default function Category({
                         )}
                     </aside>
 
-                    {/* Grid — Figma node 32:844 */}
                     <div className="flex flex-1 flex-col gap-5">
-                        {/* Sort sits above the grid, right-aligned (node 32:845). */}
                         <div className="flex justify-end">
                             <label className="flex items-center gap-2 rounded-[6px] border border-line px-3 py-2 text-[13px] text-ink">
                                 Sort by:
@@ -308,7 +300,6 @@ export default function Category({
                             </div>
                         )}
 
-                        {/* Pagination row — count left, pager right (node 32:933). */}
                         {products.length > 0 && (
                             <div className="flex flex-wrap items-center justify-between gap-3 pt-4 text-sm">
                                 <p className="text-slate">

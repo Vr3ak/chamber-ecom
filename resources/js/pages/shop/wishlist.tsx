@@ -35,7 +35,6 @@ export default function WishlistPage({ wishlist }: Props) {
             <SiteNavbar variant="dark" />
 
             <main className="mx-auto w-full max-w-shell flex-1 px-6 pt-12 pb-16 lg:px-16">
-                {/* Title row — Figma node 31:21 */}
                 <div className="flex flex-col gap-1">
                     <h1 className="text-2xl font-semibold">My Wishlist</h1>
                     <p className="text-sm text-slate">
@@ -80,7 +79,6 @@ export default function WishlistPage({ wishlist }: Props) {
                                             />
                                         )}
                                     </Link>
-                                    {/* Filled heart = remove (Figma node 31:29) */}
                                     <button
                                         onClick={() =>
                                             router.delete(

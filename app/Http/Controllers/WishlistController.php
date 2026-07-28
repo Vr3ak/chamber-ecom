@@ -12,14 +12,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/**
- * The logged-in customer's default wishlist. Session-guarded, same
- * ownership rules as CartController.
- *
- *   GET    /wishlist
- *   POST   /wishlist/items
- *   DELETE /wishlist/items/{wishlistItem}
- */
 class WishlistController extends Controller
 {
     public function show(Request $request): JsonResponse|Response
@@ -27,13 +19,11 @@ class WishlistController extends Controller
         $wishlist = $this->loadDetail(Wishlist::defaultFor($request->user()));
 
         if (! $this->wantsJson($request)) {
-            // The navbar badge comes from the shared `cartCount` prop.
             return Inertia::render('shop/wishlist', [
                 'wishlist' => WishlistResource::make($wishlist)->resolve(),
             ]);
         }
 
-        // Force 200: see the identical comment in CartController::show.
         return WishlistResource::make($wishlist)->response()->setStatusCode(200);
     }
 
@@ -42,7 +32,6 @@ class WishlistController extends Controller
         $wishlist = Wishlist::defaultFor($request->user());
         $productId = $request->validated('product_id');
 
-        // Idempotent: adding an already-saved product just returns it as-is.
         if (! $wishlist->items()->where('product_id', $productId)->exists()) {
             $wishlist->items()->create(['product_id' => $productId, 'created_at' => now()]);
         }
@@ -60,7 +49,6 @@ class WishlistController extends Controller
         return $this->respond($request, $wishlist);
     }
 
-    /** JSON for API callers, redirect-back for the Inertia page. */
     private function respond(Request $request, Wishlist $wishlist): WishlistResource|RedirectResponse
     {
         if (! $this->wantsJson($request)) {

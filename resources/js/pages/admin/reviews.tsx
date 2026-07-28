@@ -33,7 +33,6 @@ const FILTERS = [
     ['hidden', 'Hidden'],
 ] as const;
 
-/** Admin review moderation — Figma node 48:2947. */
 export default function AdminReviews({
     visibility,
     reviews,

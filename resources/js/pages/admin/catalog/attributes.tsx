@@ -25,7 +25,6 @@ type Target = { kind: 'color' | 'size'; id: number; label: string };
 const input =
     'h-10 w-full rounded-[6px] border border-line bg-transparent px-3 text-sm focus:border-ink focus:outline-none';
 
-/** Colours & Sizes — Figma node 48:2490 (one screen, two tables). */
 export default function AdminAttributes({
     colors,
     sizes,
@@ -54,7 +53,6 @@ export default function AdminAttributes({
             )}
 
             <div className="grid gap-5 xl:grid-cols-2">
-                {/* ---- Colours ---- */}
                 <div className="flex flex-col gap-5">
                     <Panel title="Add a colour">
                         <form
@@ -159,7 +157,6 @@ export default function AdminAttributes({
                     </Panel>
                 </div>
 
-                {/* ---- Sizes ---- */}
                 <div className="flex flex-col gap-5">
                     <Panel title="Add a size">
                         <form

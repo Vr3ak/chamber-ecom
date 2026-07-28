@@ -11,11 +11,6 @@ use Illuminate\Validation\ValidationException;
 
 class AdminAuthController extends Controller
 {
-    /**
-     * POST /api/admin/login
-     * Body: { email, password }
-     * Returns a Sanctum bearer token to use on protected write routes.
-     */
     public function login(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -31,7 +26,6 @@ class AdminAuthController extends Controller
             ]);
         }
 
-        // one token per login; name it after the device if you like
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         return response()->json([
@@ -45,10 +39,6 @@ class AdminAuthController extends Controller
         ]);
     }
 
-    /**
-     * GET /api/admin/me  (protected)
-     * Returns the currently authenticated admin.
-     */
     public function me(Request $request): JsonResponse
     {
         $admin = $request->user();
@@ -61,10 +51,6 @@ class AdminAuthController extends Controller
         ]);
     }
 
-    /**
-     * POST /api/admin/logout  (protected)
-     * Revokes the token used for this request.
-     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

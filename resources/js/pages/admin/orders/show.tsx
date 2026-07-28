@@ -33,7 +33,6 @@ type Props = {
     stages: string[];
 };
 
-/** Admin order detail — Figma node 48:3845. */
 export default function AdminOrderDetail({ order, timeline, stages }: Props) {
     const advance = useForm({ status: '', note: '' });
     const tracking = useForm({ tracking_number: order.tracking_number ?? '' });

@@ -14,16 +14,8 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/**
- * Admin catalogue lookups (Figma 08 — Admin · Catalog):
- * brands, categories, and the combined colours & sizes screen.
- *
- * Deletes are guarded: colours and sizes are restrictOnDelete at the database
- * level, so an in-use row is rejected with a field error instead of a 500.
- */
 class CatalogAdminController extends Controller
 {
-    // ---------------- Brands ----------------
 
     public function brands(): Response
     {
@@ -75,7 +67,6 @@ class CatalogAdminController extends Controller
         return back()->with('success', 'Brand deleted.');
     }
 
-    // ---------------- Categories ----------------
 
     public function categories(): Response
     {
@@ -112,7 +103,6 @@ class CatalogAdminController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'parent_id' => [
                 'nullable', 'integer', 'exists:categories,id',
-                // A category cannot be its own parent.
                 Rule::notIn([$category->id]),
             ],
         ]);
@@ -135,7 +125,6 @@ class CatalogAdminController extends Controller
         return back()->with('success', 'Category deleted.');
     }
 
-    // ---------------- Colours & sizes ----------------
 
     public function attributes(): Response
     {
@@ -205,7 +194,6 @@ class CatalogAdminController extends Controller
         return back()->with('success', 'Size deleted.');
     }
 
-    /** @param class-string<\Illuminate\Database\Eloquent\Model> $model */
     private function uniqueSlug(string $model, string $name): string
     {
         $base = Str::slug($name);

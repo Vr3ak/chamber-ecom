@@ -26,7 +26,6 @@ export default function Security(props: Props) {
 
             <h1 className="sr-only">Security settings</h1>
 
-            {/* Figma's Security card — node 48:2131 */}
             <div className="space-y-4 rounded-lg border border-line p-6">
                 <h2 className="text-base font-semibold">Security</h2>
                 <p className="text-sm text-slate">

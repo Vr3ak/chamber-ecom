@@ -10,12 +10,6 @@ use App\Models\Size;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- *   GET    /api/sizes         list
- *   POST   /api/sizes         create        (admin)
- *   PUT    /api/sizes/{size}  update        (admin)
- *   DELETE /api/sizes/{size}  delete        (admin)
- */
 class SizeController extends Controller
 {
     public function index(): AnonymousResourceCollection

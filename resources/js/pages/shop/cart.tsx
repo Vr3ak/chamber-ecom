@@ -37,10 +37,6 @@ export type Cart = {
 const money = (n: number) =>
     n.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
 
-// Figma shows a $5.00 shipping line (node 31:184), but Order::recalcTotals()
-// sets total = subtotal — "no shipping/tax in this project". Charging $5 here
-// would quote the customer a total the order never bills, so the row keeps the
-// design's shape and states the truth: shipping is free.
 export const SHIPPING_FLAT = 0;
 
 function variantLabel(item: CartItem): string {
@@ -107,7 +103,6 @@ export default function CartPage({ cart }: { cart: Cart }) {
                     </div>
                 ) : (
                     <div className="mt-6 flex flex-col gap-8 lg:flex-row">
-                        {/* Items list — Figma node 31:126 */}
                         <div className="flex-1 overflow-hidden rounded-lg border border-line">
                             {cart.items.map((item, i) => (
                                 <div
@@ -145,7 +140,6 @@ export default function CartPage({ cart }: { cart: Cart }) {
                                         )}
                                     </div>
 
-                                    {/* Quantity stepper — Figma node 31:132 */}
                                     <div className="flex h-8 w-24 shrink-0 items-center justify-between rounded-[6px] border border-line px-3">
                                         <button
                                             onClick={() =>
@@ -197,7 +191,6 @@ export default function CartPage({ cart }: { cart: Cart }) {
                             ))}
                         </div>
 
-                        {/* Summary — Figma node 31:179 */}
                         <aside className="flex w-full shrink-0 flex-col gap-4 self-start rounded-lg border border-line p-6 lg:w-[448px]">
                             <h2 className="text-lg font-semibold">
                                 Order Summary
